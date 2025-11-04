@@ -1,0 +1,219 @@
+/* ===== Container ===== */
+.admin-container {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 1rem;
+	font-family: 'Segoe UI', sans-serif;
+	color: #333;
+}
+
+/* ===== Alerts ===== */
+.alert {
+	padding: 0.75rem 1rem;
+	margin-bottom: 1rem;
+	border-radius: 8px;
+	font-weight: 500;
+	transition: all 0.3s ease;
+}
+
+.alert.success {
+	background: #d4edda;
+	color: #155724;
+}
+
+.alert.error {
+	background: #f8d7da;
+	color: #721c24;
+}
+
+/* ===== Calendar ===== */
+.calendar-grid {
+	display: flex;
+	gap: 0.5rem;
+	margin-top: 0.5rem;
+}
+
+.calendar-day {
+	flex: 1;
+	background: #f8f9fa;
+	border-radius: 12px;
+	padding: 0.75rem 0;
+	text-align: center;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.calendar-day div {
+	margin: 2px 0;
+}
+
+.calendar-day.selected {
+	background: linear-gradient(135deg, #667eea, #764ba2);
+	color: white;
+	font-weight: bold;
+	transform: scale(1.05);
+}
+
+.calendar-day:hover:not(.disabled):not(.selected) {
+	background: #667eea33;
+	transform: translateY(-3px);
+}
+
+.calendar-day.disabled {
+	opacity: 0.4;
+	cursor: not-allowed;
+	background: #e9ecef;
+}
+
+/* ===== Machine List ===== */
+.machine-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	margin-top: 1rem;
+}
+
+.machine-item {
+	flex: 1 1 45%;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.75rem 1rem;
+	border-radius: 12px;
+	background: #f1f3f5;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+	cursor: pointer;
+	transition: all 0.3s ease;
+}
+
+.machine-item:hover:not(.booked) {
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.machine-item input[type='checkbox'] {
+	cursor: pointer;
+}
+
+.machine-item.booked {
+	background: #f8d7da;
+	cursor: not-allowed;
+	opacity: 0.8;
+}
+
+.machine-item.selected {
+	background: linear-gradient(135deg, #28a745, #20c997);
+	color: white;
+	font-weight: bold;
+	transform: scale(1.05);
+}
+
+.maintenance {
+	font-size: 0.8rem;
+	color: #dc3545;
+	font-style: italic;
+	margin-left: auto;
+}
+
+.machine-status {
+	margin-left: auto;
+	font-weight: 600;
+	padding: 0.25rem 0.5rem;
+	border-radius: 6px;
+	font-size: 0.75rem;
+	text-align: center;
+	min-width: 70px;
+}
+
+.status-available {
+	background: #d4edda;
+	color: #155724;
+}
+
+.status-booked {
+	background: #f8d7da;
+	color: #721c24;
+}
+
+.status-inactive {
+	background: #ffeeba;
+	color: #856404;
+}
+
+/* ===== Selected Machines Summary ===== */
+.selected-summary {
+	margin-top: 1rem;
+	padding: 0.75rem 1rem;
+	background: #e9ecef;
+	border-radius: 8px;
+	font-weight: 500;
+}
+
+/* ===== Form ===== */
+.form-container {
+	margin-top: 1.5rem;
+}
+
+.form-group {
+	display: flex;
+	flex-direction: column;
+	margin-bottom: 1rem;
+}
+
+.form-group label {
+	margin-bottom: 0.25rem;
+	font-weight: 600;
+}
+
+.form-group select {
+	padding: 0.5rem;
+	border-radius: 6px;
+	border: 1px solid #ced4da;
+	font-size: 1rem;
+	transition: all 0.3s ease;
+}
+
+.form-group select:hover {
+	border-color: #667eea;
+}
+
+/* ===== Buttons ===== */
+.btn {
+	padding: 0.7rem 1.2rem;
+	border: none;
+	border-radius: 6px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.3s ease;
+}
+
+.btn-success {
+	background: linear-gradient(135deg, #28a745, #20c997);
+	color: white;
+}
+
+.btn-success:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-danger {
+	background: linear-gradient(135deg, #f093fb, #f5576c);
+	color: white;
+}
+
+.btn-danger:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+	.machine-item {
+		flex: 1 1 100%;
+	}
+	.calendar-grid {
+		flex-direction: column;
+	}
+}
