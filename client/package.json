@@ -3,6 +3,8 @@
 	"version": "1.0.0",
 	"description": "Frontend for washing machine booking system",
 	"dependencies": {
+		"ajv": "^6.12.6",
+        "ajv-keywords": "^3.5.2",
 		"axios": "^1.5.0",
 		"date-fns": "^2.30.0",
 		"i18next": "22.5.0",
