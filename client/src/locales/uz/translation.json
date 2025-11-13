@@ -7,7 +7,7 @@
 	"home": {
 		"title": "Kir Yuvish Mashinasi Bron Tizimi",
 		"subtitle": "Xonangiz raqami bilan ro'yxatdan o'ting va mashinalarni bron qiling",
-		"booking": "Mashina Bron Qilish"
+		"booking": "Kir yuvish mashinasi bron qilish"
 	},
 	"register": {
 		"title": "Ro'yxatdan O'tish",
@@ -16,12 +16,13 @@
 		"fullNamePlaceholder": "Masalan: Ali Valiyev",
 		"roomPlaceholder": "Masalan: 101",
 		"submit": "Ro'yxatdan O'tish",
-		"loading": "Kutilmoqda...",
-		"nameRequired": "Ism va familiya kiritilishi shart",
-		"roomRequired": "Xona raqami kiritilishi shart",
+		"loading": "Yuklanmoqda...",
+		"nameRequired": "Iltimos, ism va familiyangizni kiriting",
+		"roomRequired": "Iltimos, xona raqamingizni kiriting",
 		"nameLength": "Ism-familiya kamida 5 ta belgidan iborat bo'lishi kerak",
 		"roomFormat": "Xona raqami 3 ta raqamdan iborat bo'lishi kerak",
-		"success": "Muvaffaqiyatli ro'yxatdan o'tdingiz!"
+		"success": "Muvaffaqiyatli ro'yxatdan o'tdingiz!",
+		 "alreadyRegistered": "Siz allaqachon ro'yxatdan o'tgansiz"
 	},
 	"booking": {
 		"selectDate": "Kunni Tanlang",

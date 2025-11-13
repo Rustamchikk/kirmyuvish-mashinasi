@@ -1,124 +1,159 @@
+// src/pages/UserBookings.js
 import { format } from 'date-fns'
 import { useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router-dom'
 import '../App.css'
-import Alert from '../components/Alert'
 import Loading from '../components/Loading'
-import { bookingAPI } from '../services/api'
-import './UserBookings.css'
+import { bookingAPI, userAPI } from '../services/api' // userAPI qo'shildi
+import { useAuth } from '../contexts/AuthContext'
 
 const UserBookings = () => {
-	const { t } = useTranslation()
-	const { roomNumber } = useParams()
-	const navigate = useNavigate()
-	const [bookings, setBookings] = useState([])
-	const [loading, setLoading] = useState(true)
-	const [alert, setAlert] = useState({ type: '', message: '' })
+  const navigate = useNavigate()
+  const { roomNumber } = useParams()
+  const { userRoom, userName } = useAuth()
+  const [bookings, setBookings] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [verified, setVerified] = useState(false)
 
-	useEffect(() => {
-		loadUserBookings()
-	}, [roomNumber])
+  useEffect(() => {
+    const targetRoom = roomNumber || userRoom
+    
+    if (targetRoom && userName) {
+      verifyAndLoadBookings(targetRoom, userName)
+    } else {
+      navigate('/')
+    }
+  }, [userRoom, userName, roomNumber, navigate])
 
-	const showAlert = (type, message) => {
-		setAlert({ type, message })
-		setTimeout(() => setAlert({ type: '', message: '' }), 5000)
-	}
+  const verifyAndLoadBookings = async (room, name) => {
+    try {
+      // Foydalanuvchini qayta tekshiramiz
+      const verifyResponse = await userAPI.verifyUser(room, name)
+      
+      if (verifyResponse.data.exists) {
+        setVerified(true)
+        await loadUserBookings(room)
+      } else {
+        navigate('/')
+      }
+    } catch (error) {
+      console.log('Foydalanuvchini tekshirishda xatolik:', error)
+      navigate('/')
+    }
+  }
 
-	const loadUserBookings = async () => {
-		try {
-			const response = await bookingAPI.getUserBookings(Number(roomNumber))
-			setBookings(response.data.data)
-		} catch (error) {
-			showAlert('error', t('error.loadBookings'))
-		} finally {
-			setLoading(false)
-		}
-	}
+  const loadUserBookings = async (room) => {
+    try {
+      const response = await bookingAPI.getUserBookings(room)
+      setBookings(response.data.data || [])
+    } catch (error) {
+      console.log('Bronlarni yuklashda xatolik:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
-	const handleDeleteBooking = async id => {
-		if (!window.confirm(t('common.confirmDelete'))) return
-		try {
-			await bookingAPI.delete(id)
-			showAlert('success', t('booking.cancelSuccess'))
-			loadUserBookings()
-		} catch (error) {
-			showAlert('error', t('error.cancelBooking'))
-		}
-	}
+  if (loading) return <Loading />
 
-	const handleBackToHome = () => navigate('/')
+  if (!verified) {
+    return (
+      <div className='container'>
+        <div className='form-container'>
+          <h2>Kirish rad etildi</h2>
+          <p>Ism va xona raqami mos kelmadi yoki sizga ruxsat yo'q.</p>
+          <button onClick={() => navigate('/')} className='btn btn-primary'>
+            Bosh sahifaga qaytish
+          </button>
+        </div>
+      </div>
+    )
+  }
 
-	if (loading) return <Loading />
+  return (
+    <div className='container'>
+      <div className='user-info'>
+        <h2>Ism Familiya: {userName}</h2>
+        <h2>Xona raqami: {roomNumber || userRoom}</h2>
+      </div>
 
-	return (
-		<div className='container'>
-			<div className='hero'>
-				<h1>{t('booking.myBookings')}</h1>
-				<p>
-					{t('common.room')}: <strong>{roomNumber}</strong>
-				</p>
-				<div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-					<button onClick={handleBackToHome} className='btn'>
-						{t('header.home')}
-					</button>
-					<button
-						onClick={() => navigate('/')}
-						className='btn'
-						style={{ background: '#28a745' }}
-					>
-						{t('booking.newBooking')}
-					</button>
-				</div>
-			</div>
+      <div className='form-container'>
+        <h2>Bronlar ro'yxati</h2>
+        
+        {bookings.length === 0 ? (
+          <div style={{ textAlign: 'center', color: '#666', padding: '3rem' }}>
+            <h3>Hozircha bronlar mavjud emas</h3>
+          </div>
+        ) : (
+          <div className='table-responsive'>
+            <table className='table'>
+              <thead>
+                <tr>
+                  <th>Sana</th>
+                  <th>Vaqt oralig'i</th>
+                  <th>Mashina nomi</th>
+                  <th>Bron qilingan vaqt</th>
+                </tr>
+              </thead>
+              <tbody>
+                {bookings.map(booking => (
+                  <tr key={booking.id}>
+                    <td>
+                      {format(new Date(booking.booking_date), 'dd.MM.yyyy')}
+                    </td>
+                    <td>
+                      <strong>{booking.time_slot}</strong>
+                    </td>
+                    <td>
+                      {booking.machine_name}
+                    </td>
+                    <td>
+                      {format(new Date(booking.created_at), 'dd.MM.yyyy HH:mm')}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
 
-			<Alert type={alert.type} message={alert.message} />
-
-			<div className='form-container'>
-				<h2>{t('booking.bookingList')}</h2>
-				{bookings.length === 0 ? (
-					<p style={{ textAlign: 'center', color: '#666', padding: '2rem' }}>
-						{t('booking.noBookings')}
-					</p>
-				) : (
-					<table className='table'>
-						<thead>
-							<tr>
-								<th>{t('booking.date')}</th>
-								<th>{t('booking.time')}</th>
-								<th>{t('admin.machines')}</th>
-								<th>{t('booking.bookedDate')}</th>
-								<th>{t('common.actions')}</th>
-							</tr>
-						</thead>
-						<tbody>
-							{bookings.map(booking => (
-								<tr key={booking.id}>
-									<td>
-										{format(new Date(booking.booking_date), 'dd.MM.yyyy')}
-									</td>
-									<td>{booking.time_slot}</td>
-									<td>{booking.machine_name}</td>
-									<td>
-										{format(new Date(booking.created_at), 'dd.MM.yyyy HH:mm')}
-									</td>
-									<td>
-										<button
-											onClick={() => handleDeleteBooking(booking.id)}
-											className='btn btn-danger'
-											style={{ padding: '0.5rem 1rem', fontSize: '0.9rem' }}
-										>
-											{t('booking.cancel')}
-										</button>
-									</td>
-								</tr>
-							))}
-						</tbody>
-					</table>
-				)}
-			</div>
-		</div>
-	)
+      <style jsx>{`
+        .user-info {
+          background: #f8f9fa;
+          padding: 2rem;
+          border-radius: 8px;
+          margin: 2rem 0;
+          text-align: center;
+        }
+        .user-info h2 {
+          margin: 0.5rem 0;
+          color: #333;
+        }
+        .table-responsive {
+          overflow-x: auto;
+        }
+        .table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 1rem;
+        }
+        .table th,
+        .table td {
+          padding: 1rem;
+          text-align: left;
+          border-bottom: 1px solid #dee2e6;
+        }
+        .table th {
+          background-color: #3d5deb;
+          color: white;
+          font-weight: 600;
+        }
+        .table tr:hover {
+          background-color: #f8f9fa;
+        }
+      `}</style>
+    </div>
+  )
 }
 
 export default UserBookings

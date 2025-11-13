@@ -1,3 +1,4 @@
+// services/api.js
 import axios from 'axios'
 
 const API_BASE_URL =
@@ -13,6 +14,14 @@ const api = axios.create({
 export const userAPI = {
 	register: userData => api.post('/users/register', userData),
 	getAll: () => api.get('/users'),
+	// YANGI: Foydalanuvchini tekshirish funksiyasi
+	verifyUser: (roomNumber, fullName) => 
+		api.get('/users/verify', { 
+			params: { 
+				room_number: roomNumber, 
+				full_name: fullName 
+			} 
+		}),
 }
 
 export const bookingAPI = {
@@ -25,8 +34,8 @@ export const bookingAPI = {
 export const machineAPI = {
 	getAll: () => api.get('/machines'),
 	update: (id, data) => api.patch(`/machines/${id}`, data),
-	create: data => api.post('/machines', data), // YANGI
-	delete: id => api.delete(`/machines/${id}`), // YANGI
+	create: data => api.post('/machines', data),
+	delete: id => api.delete(`/machines/${id}`),
 }
 
 export default api

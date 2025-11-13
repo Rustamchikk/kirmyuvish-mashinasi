@@ -1,3 +1,4 @@
+// pages/Admin.js
 import { format } from 'date-fns'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -5,9 +6,12 @@ import '../App.css'
 import Alert from '../components/Alert'
 import Loading from '../components/Loading'
 import { bookingAPI, machineAPI, userAPI } from '../services/api'
+import { useAuth } from '../contexts/AuthContext'
 
 const Admin = () => {
 	const { t } = useTranslation()
+	const { adminLogin } = useAuth()
+
 	const [users, setUsers] = useState([])
 	const [bookings, setBookings] = useState([])
 	const [machines, setMachines] = useState([])
@@ -47,6 +51,7 @@ const Admin = () => {
 	const handleLogin = e => {
 		e.preventDefault()
 		if (auth.username === 'rustam' && auth.password === '12345678') {
+			adminLogin()
 			setIsAuthenticated(true)
 			showAlert('success', t('admin.loginSuccess'))
 		} else {
@@ -114,12 +119,7 @@ const Admin = () => {
 		<div className='admin-container'>
 			<header className='admin-header'>
 				<h1>{t('admin.title')}</h1>
-				<button
-					onClick={() => setIsAuthenticated(false)}
-					className='btn-danger logout-btn'
-				>
-					{t('admin.logout')}
-				</button>
+				{/* LOGOUT TUGMASI OLIB TASHLANDI */}
 			</header>
 
 			<Alert type={alert.type} message={alert.message} />
