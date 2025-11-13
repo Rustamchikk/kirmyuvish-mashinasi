@@ -61,6 +61,7 @@ const Register = ({ onRegister }) => {
 			<h2>{t('register.title')}</h2>
 			<Alert type={alert.type} message={alert.message} />
 			<form onSubmit={handleSubmit}>
+			
 				<div className='form-group'>
 					<label>{t('register.fullName')}</label>
 					<input
