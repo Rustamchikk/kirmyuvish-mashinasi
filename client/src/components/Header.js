@@ -30,6 +30,12 @@ const Header = () => {
 		}
 	}
 
+	// Til nomlari obyekti
+	const languageNames = {
+		uz: "O'Z",
+		en: "EN", 
+		ru: "RU"
+	}
 
 	return (
 		<>
@@ -42,7 +48,7 @@ const Header = () => {
 						<button
 							className='menu-toggle'
 							onClick={() => setMenuOpen(!menuOpen)}
-							aria-label='Toggle menu'
+							aria-label={t('header.toggleMenu')}
 						>
 							{menuOpen ? <X size={24} /> : <Menu size={24} />}
 						</button>
@@ -50,7 +56,7 @@ const Header = () => {
 						{/* Logo */}
 						<div className='logo'>
 							<div className='logo-text'>
-								<div className='logo-title'>Стиральная Машина</div>
+								<div className='logo-title'>{t('header.logo')}</div>
 							</div>
 						</div>
 					</div>
@@ -68,7 +74,7 @@ const Header = () => {
 								>
 									{['uz', 'en', 'ru'].map(lang => (
 										<option key={lang} value={lang}>
-											{lang.toUpperCase()}
+											{languageNames[lang]}
 										</option>
 									))}
 								</select>
@@ -83,7 +89,7 @@ const Header = () => {
 										onClick={() => changeLanguage(lang)}
 										className={`lang-btn ${i18n.language === lang ? 'active' : ''}`}
 									>
-										{lang.toUpperCase()}
+										{languageNames[lang]}
 									</button>
 								))}
 							</div>
@@ -92,8 +98,8 @@ const Header = () => {
 						{/* Exit Button */}
 						<button className='exit-btn' onClick={handleExit}>
 							<LogOut size={18} />
-							<span className='exit-text'>Exit</span>
-							<span className='exit-icon'>Exit</span>
+							<span className='exit-text'>{t('header.exit')}</span>
+							<span className='exit-icon'>{t('header.exit')}</span>
 						</button>
 					</div>
 				</div>
@@ -111,7 +117,7 @@ const Header = () => {
 				</div>
 			</header>
 
-			{/* STYLE */}
+			{/* STYLE - O'ZGARMADI */}
 			<style jsx>{`
 				/* ==== HEADER ==== */
 				.main-header {

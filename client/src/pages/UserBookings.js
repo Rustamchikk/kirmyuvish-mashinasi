@@ -2,12 +2,14 @@
 import { format } from 'date-fns'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import '../App.css'
 import Loading from '../components/Loading'
-import { bookingAPI, userAPI } from '../services/api' // userAPI qo'shildi
+import { bookingAPI, userAPI } from '../services/api'
 import { useAuth } from '../contexts/AuthContext'
 
 const UserBookings = () => {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { roomNumber } = useParams()
   const { userRoom, userName } = useAuth()
@@ -37,7 +39,7 @@ const UserBookings = () => {
         navigate('/')
       }
     } catch (error) {
-      console.log('Foydalanuvchini tekshirishda xatolik:', error)
+      console.log(t('userBookings.verificationError'), error)
       navigate('/')
     }
   }
@@ -47,7 +49,7 @@ const UserBookings = () => {
       const response = await bookingAPI.getUserBookings(room)
       setBookings(response.data.data || [])
     } catch (error) {
-      console.log('Bronlarni yuklashda xatolik:', error)
+      console.log(t('userBookings.loadBookingsError'), error)
     } finally {
       setLoading(false)
     }
@@ -59,10 +61,10 @@ const UserBookings = () => {
     return (
       <div className='container'>
         <div className='form-container'>
-          <h2>Kirish rad etildi</h2>
-          <p>Ism va xona raqami mos kelmadi yoki sizga ruxsat yo'q.</p>
+          <h2>{t('userBookings.accessDenied')}</h2>
+          <p>{t('userBookings.accessDeniedMessage')}</p>
           <button onClick={() => navigate('/')} className='btn btn-primary'>
-            Bosh sahifaga qaytish
+            {t('userBookings.backToHome')}
           </button>
         </div>
       </div>
@@ -72,26 +74,26 @@ const UserBookings = () => {
   return (
     <div className='container'>
       <div className='user-info'>
-        <h2>Ism Familiya: {userName}</h2>
-        <h2>Xona raqami: {roomNumber || userRoom}</h2>
+        <h2>{t('userBookings.fullName')}: {userName}</h2>
+        <h2>{t('userBookings.roomNumber')}: {roomNumber || userRoom}</h2>
       </div>
 
       <div className='form-container'>
-        <h2>Bronlar ro'yxati</h2>
+        <h2>{t('userBookings.bookingList')}</h2>
         
         {bookings.length === 0 ? (
           <div style={{ textAlign: 'center', color: '#666', padding: '3rem' }}>
-            <h3>Hozircha bronlar mavjud emas</h3>
+            <h3>{t('userBookings.noBookings')}</h3>
           </div>
         ) : (
           <div className='table-responsive'>
             <table className='table'>
               <thead>
                 <tr>
-                  <th>Sana</th>
-                  <th>Vaqt oralig'i</th>
-                  <th>Mashina nomi</th>
-                  <th>Bron qilingan vaqt</th>
+                  <th>{t('userBookings.date')}</th>
+                  <th>{t('userBookings.timeSlot')}</th>
+                  <th>{t('userBookings.machineName')}</th>
+                  <th>{t('userBookings.bookedTime')}</th>
                 </tr>
               </thead>
               <tbody>

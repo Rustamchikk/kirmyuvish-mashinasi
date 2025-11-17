@@ -2,12 +2,23 @@
 	"header": {
 		"title": "Washing Machine",
 		"home": "Home",
-		"admin": "Admin"
+		"admin": "Admin",
+		"exit": "Exit",
+        "logo": "Washing Machine",
+        "toggleMenu": "Toggle menu"
 	},
 	"home": {
 		"title": "Washing Machine Booking System",
 		"subtitle": "Register with your room number and book machines",
-		"booking": "Machine Booking"
+		"booking": "Machine Booking",
+		"room": "Room",
+		"myBookings": "My Bookings",
+		"loadMachinesError": "Error loading machines",
+		"loadBookingsError": "Error loading bookings",
+		"chooseMachine": "Please select a machine",
+		"bookingSuccess": "Successfully booked!",
+		"bookingError": "Unknown error occurred during booking",
+		"viewAllBookings": "View All Bookings"
 	},
 	"register": {
 		"title": "Registration",
@@ -21,7 +32,15 @@
 		"roomRequired": "Room number is required",
 		"nameLength": "Full name must be at least 5 characters",
 		"roomFormat": "Room number must be 3 digits",
-		"success": "Successfully registered!"
+		"success": "Successfully registered!",
+		"roomsLoadError": "Failed to load rooms list",
+         "registrationError": "Registration error occurred",
+    	"viewBookingsRequired": "Enter name and room number to view bookings",
+    	"userNotRegistered": "No registration found with this name and room number",
+    	"userNotFound": "User does not exist or an error occurred",
+    	"registerButton": "Register",
+    	"viewBookingsButton": "View My Bookings",
+    	"checking": "Checking..."
 	},
 	"booking": {
 		"selectDate": "Select Date",
@@ -47,7 +66,8 @@
 		"bookedDate": "Booked Date",
 		"cancel": "Cancel",
 		"cancelSuccess": "Booking successfully canceled",
-		"noBookings": "No bookings available"
+		"noBookings": "No bookings available",
+		"active": "Active"
 	},
 	"admin": {
 		"title": "Admin Panel",
@@ -83,7 +103,22 @@
 		"machineAdded": "Machine successfully added",
 		"machineDeleted": "Machine successfully deleted",
 		"machineNameRequired": "Enter machine name",
-		"noUsers": "No registered users"
+		"noUsers": "No registered users",
+		"sessionMonitoring": "🖥️ Session Monitoring",
+		"activeSessions": "Active Sessions",
+		"devices": "Devices",
+		"viewSessions": "View Sessions",
+		"endSessionConfirmation": "Are you sure you want to end this session?",
+		"endAllSessionsConfirmation": "Are you sure you want to end all sessions?",
+		"endSessionError": "Error ending session",
+		"endAllSessionsError": "Error ending sessions",
+		"deleteUserError": "Error deleting user",
+		"deleteAllUsersError": "Error deleting users",
+		"superAdmin": "Super Admin",
+		"admin": "Admin",
+		"registeredAt": "Registered At",
+		"noUsersFound": "No Users Found",
+		"noUsersMessage": "No registered users found"
 	},
 	"common": {
 		"room": "Room",
@@ -136,5 +171,41 @@
 		"minLength": "Minimum {{count}} characters required",
 		"maxLength": "Maximum {{count}} characters allowed",
 		"onlyNumbers": "Only numbers are allowed"
-	}
+	},
+	"loading": {
+    "text": "Loading..."
+  },
+  "sessionModal": {
+    "title": "🖥️ Active Admin Sessions",
+    "subtitle": "All active admin sessions and devices",
+    "totalSessions": "Total Sessions",
+    "uniqueIPs": "Unique IPs",
+    "deviceTypes": "Device Types",
+    "noSessionsTitle": "No Active Sessions Found",
+    "noSessionsMessage": "Currently there are no active admin sessions",
+    "active": "Active",
+    "loginTime": "🕐 Login Time:",
+    "ipAddress": "📍 IP Address:",
+    "unknown": "Unknown",
+    "endSessionTooltip": "End session",
+    "endSession": "End Session",
+    "endAllSessions": "End All Sessions",
+    "close": "Close"
+  },
+  "userBookings": {
+    "accessDenied": "Access Denied",
+    "accessDeniedMessage": "Name and room number do not match or you don't have permission.",
+    "backToHome": "Back to Home",
+    "fullName": "Full Name",
+    "roomNumber": "Room Number",
+    "bookingList": "Booking List",
+    "noBookings": "No bookings available at the moment",
+    "date": "Date",
+    "timeSlot": "Time Slot",
+    "machineName": "Machine Name",
+    "bookedTime": "Booked Time",
+    "verificationError": "User verification error:",
+    "loadBookingsError": "Error loading bookings:",
+	"active": "Active"
+  }
 }

@@ -27,14 +27,14 @@ const Register = ({ onRegister }) => {
         }
       } catch (error) {
         console.error('Xonalarni olishda xatolik:', error)
-        showAlert('error', 'Xonalar ro\'yxatini yuklab bo\'lmadi')
+        showAlert('error', t('register.roomsLoadError'))
       } finally {
         setRoomsLoading(false)
       }
     }
 
     fetchAvailableRooms()
-  }, [])
+  }, [t])
 
   const showAlert = (type, message) => {
     setAlert({ type, message })
@@ -67,7 +67,7 @@ const Register = ({ onRegister }) => {
       }
     } catch (error) {
       // Backenddan kelgan xatolik xabarini ko'rsatish
-      const errorMessage = error.response?.data?.message || 'Ro\'yxatdan o\'tishda xatolik yuz berdi'
+      const errorMessage = error.response?.data?.message || t('register.registrationError')
       showAlert('error', errorMessage)
     } finally {
       setLoading(false)
@@ -78,7 +78,7 @@ const Register = ({ onRegister }) => {
     e.preventDefault()
 
     if (!user.full_name.trim() || !user.room_number.trim()) {
-      showAlert('error', 'Bronlarni ko\'rish uchun ism va xona raqamini kiriting')
+      showAlert('error', t('register.viewBookingsRequired'))
       return
     }
 
@@ -90,11 +90,11 @@ const Register = ({ onRegister }) => {
         login(user.room_number, user.full_name)
         navigate(`/bookings/${user.room_number}`)
       } else {
-        showAlert('error', response.data.message || 'Bu ism va xona raqami bilan ro\'yxatdan o\'tilmagan')
+        showAlert('error', response.data.message || t('register.userNotRegistered'))
       }
     } catch (error) {
       console.error('Foydalanuvchini tekshirishda xatolik:', error)
-      const errorMessage = error.response?.data?.message || 'Foydalanuvchi mavjud emas yoki xatolik yuz berdi'
+      const errorMessage = error.response?.data?.message || t('register.userNotFound')
       showAlert('error', errorMessage)
     } finally {
       setLoading(false)
@@ -114,7 +114,6 @@ const Register = ({ onRegister }) => {
             value={user.full_name}
             onChange={e => setUser({ ...user, full_name: e.target.value })}
             required
-            placeholder='Ism Familiya'
             disabled={loading}
           />
         </div>
@@ -127,7 +126,6 @@ const Register = ({ onRegister }) => {
             onChange={e => setUser({ ...user, room_number: e.target.value.replace(/[^0-9]/g, '') })}
             required
             maxLength='3'
-            placeholder='123'
             disabled={loading}
           />
         </div>
@@ -139,7 +137,7 @@ const Register = ({ onRegister }) => {
             className='btn btn-primary' 
             disabled={loading}
           >
-            {loading ? t('register.loading') : 'Ro\'yxatdan o\'tish'}
+            {loading ? t('register.loading') : t('register.registerButton')}
           </button>
           
           <button 
@@ -148,7 +146,7 @@ const Register = ({ onRegister }) => {
             className='btn btn-secondary'
             disabled={loading}
           >
-            {loading ? 'Tekshirilmoqda...' : 'Mening bronlarimni ko\'rish'}
+            {loading ? t('register.checking') : t('register.viewBookingsButton')}
           </button>
         </div>
       </form>

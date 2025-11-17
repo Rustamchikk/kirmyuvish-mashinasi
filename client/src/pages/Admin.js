@@ -139,7 +139,7 @@ const Admin = () => {
 
   // Session boshqaruv funksiyalari - YANGILANDI
   const handleEndSession = async (sessionId) => {
-    if (!window.confirm('Ushbu sessionni o\'chirishni istaysizmi?')) return
+    if (!window.confirm(t('admin.endSessionConfirmation'))) return
     
     try {
       const response = await adminMonitoringAPI.endSession(sessionId)
@@ -162,13 +162,13 @@ const Admin = () => {
         showAlert('success', response.data.message)
       }
     } catch (error) {
-      const message = error.response?.data?.message || 'Sessionni o\'chirishda xatolik'
+      const message = error.response?.data?.message || t('admin.endSessionError')
       showAlert('error', message)
     }
   }
 
   const handleEndAllSessions = async () => {
-    if (!window.confirm('Barcha sessionlarni o\'chirishni istaysizmi?')) return
+    if (!window.confirm(t('admin.endAllSessionsConfirmation'))) return
     
     try {
       const response = await adminMonitoringAPI.endAllSessions()
@@ -189,7 +189,7 @@ const Admin = () => {
         showAlert('success', response.data.message)
       }
     } catch (error) {
-      const message = error.response?.data?.message || 'Sessionlarni o\'chirishda xatolik'
+      const message = error.response?.data?.message || t('admin.endAllSessionsError')
       showAlert('error', message)
     }
   }
@@ -203,7 +203,7 @@ const Admin = () => {
       showAlert('success', t('admin.userDeleted'))
       loadData()
     } catch (error) {
-      showAlert('error', 'Foydalanuvchini o\'chirishda xatolik')
+      showAlert('error', t('admin.deleteUserError'))
     }
   }
 
@@ -216,7 +216,7 @@ const Admin = () => {
       showAlert('success', t('admin.allUsersDeleted'))
       loadData()
     } catch (error) {
-      showAlert('error', 'Foydalanuvchilarni o\'chirishda xatolik')
+      showAlert('error', t('admin.deleteAllUsersError'))
     }
   }
 
@@ -269,7 +269,7 @@ const Admin = () => {
         <h1>{t('admin.title')}</h1>
         <div className='admin-info'>
           <span className={`admin-badge ${adminType === 'super' ? 'super-admin' : 'regular-admin'}`}>
-            {adminType === 'super' ? t('superAdmin') : t('Admin')}
+            {adminType === 'super' ? t('admin.superAdmin') : t('admin.admin')}
           </span>
         </div>
       </header>
@@ -280,25 +280,25 @@ const Admin = () => {
       {adminType === 'super' && (
         <section className='session-monitoring-section'>
           <div className='section-header'>
-            <h2>🖥️ Session Monitoring</h2>
+            <h2>{t('admin.sessionMonitoring')}</h2>
             <div className='session-stats'>
               {sessionStats && (
                 <div className='stats-badge'>
                   <span className='stat-number'>{sessionStats.active_sessions}</span>
-                  <span className='stat-label'>Faol Sessionlar</span>
+                  <span className='stat-label'>{t('admin.activeSessions')}</span>
                 </div>
               )}
               {sessionStats && (
                 <div className='stats-badge'>
                   <span className='stat-number'>{sessionStats.unique_devices}</span>
-                  <span className='stat-label'>Qurilmalar</span>
+                  <span className='stat-label'>{t('admin.devices')}</span>
                 </div>
               )}
               <button 
                 onClick={() => setShowSessionModal(true)}
                 className='btn-info'
               >
-                📊 Sessionlarni Ko'rish
+                📊 {t('admin.viewSessions')}
               </button>
             </div>
           </div>
@@ -453,10 +453,10 @@ const Admin = () => {
               <table className='users-table'>
                 <thead>
                   <tr>
-                    <th>Ism</th>
-                    <th>Xona</th>
-                    <th>Ro'yxatdan O'tgan</th>
-                    <th>Amallar</th>
+                    <th>{t('common.name')}</th>
+                    <th>{t('common.room')}</th>
+                    <th>{t('admin.registeredAt')}</th>
+                    <th>{t('common.actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -483,8 +483,8 @@ const Admin = () => {
             ) : (
               <div className='no-users'>
                 <div className='no-users-icon'>👥</div>
-                <h4>Foydalanuvchilar Topilmadi</h4>
-                <p>Hech qanday ro'yxatdan o'tgan foydalanuvchi topilmadi</p>
+                <h4>{t('admin.noUsersFound')}</h4>
+                <p>{t('admin.noUsersMessage')}</p>
               </div>
             )}
           </div>

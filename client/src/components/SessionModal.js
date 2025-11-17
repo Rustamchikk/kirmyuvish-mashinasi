@@ -1,8 +1,11 @@
 // components/SessionModal.js - YANGILANGAN VERSIYA
 import React from 'react';
 import { format } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 const SessionModal = ({ sessions, onClose, onEndSession, onEndAllSessions }) => {
+  const { t } = useTranslation();
+
   const getDeviceIcon = (deviceType) => {
     switch (deviceType) {
       case 'Mobile': return '📱';
@@ -38,8 +41,8 @@ const SessionModal = ({ sessions, onClose, onEndSession, onEndAllSessions }) => 
       <div className='modal-content' onClick={(e) => e.stopPropagation()}>
         <div className='modal-header'>
           <div className='modal-title'>
-            <h3>🖥️ Faol Admin Sessionlari</h3>
-            <p className='modal-subtitle'>Barcha faol admin sessionlari va qurilmalar</p>
+            <h3>{t('sessionModal.title')}</h3>
+            <p className='modal-subtitle'>{t('sessionModal.subtitle')}</p>
           </div>
           <button onClick={onClose} className='btn-close'>
             ✕
@@ -52,19 +55,19 @@ const SessionModal = ({ sessions, onClose, onEndSession, onEndAllSessions }) => 
             <div className='session-stats-panel'>
               <div className='stat-item'>
                 <span className='stat-number'>{sessions.length}</span>
-                <span className='stat-label'>Jami Sessionlar</span>
+                <span className='stat-label'>{t('sessionModal.totalSessions')}</span>
               </div>
               <div className='stat-item'>
                 <span className='stat-number'>
                   {new Set(sessions.map(s => s.ip_address)).size}
                 </span>
-                <span className='stat-label'>Unique IP</span>
+                <span className='stat-label'>{t('sessionModal.uniqueIPs')}</span>
               </div>
               <div className='stat-item'>
                 <span className='stat-number'>
                   {new Set(sessions.map(s => s.device_info?.device)).size}
                 </span>
-                <span className='stat-label'>Qurilma Turi</span>
+                <span className='stat-label'>{t('sessionModal.deviceTypes')}</span>
               </div>
             </div>
           )}
@@ -72,8 +75,8 @@ const SessionModal = ({ sessions, onClose, onEndSession, onEndAllSessions }) => 
           {sessions.length === 0 ? (
             <div className='no-sessions'>
               <div className='no-sessions-icon'>🕒</div>
-              <h4>Faol Sessionlar Topilmadi</h4>
-              <p>Hozirda hech qanday faol admin sessioni mavjud emas</p>
+              <h4>{t('sessionModal.noSessionsTitle')}</h4>
+              <p>{t('sessionModal.noSessionsMessage')}</p>
             </div>
           ) : (
             <div className='sessions-grid'>
@@ -89,18 +92,18 @@ const SessionModal = ({ sessions, onClose, onEndSession, onEndAllSessions }) => 
                         <div className='session-id'>ID: {session.id}</div>
                       </div>
                     </div>
-                    <div className='session-status active'>Faol</div>
+                    <div className='session-status active'>{t('sessionModal.active')}</div>
                   </div>
 
                   <div className='session-details'>
                     <div className='detail-row'>
-                      <span className='detail-label'>🕐 Kirish Vaqti:</span>
+                      <span className='detail-label'>{t('sessionModal.loginTime')}</span>
                       <span className='detail-value'>
                         {format(new Date(session.login_time), 'dd.MM.yyyy HH:mm')}
                       </span>
                     </div>
                     <div className='detail-row'>
-                      <span className='detail-label'>📍 IP Manzil:</span>
+                      <span className='detail-label'>{t('sessionModal.ipAddress')}</span>
                       <span className='detail-value ip-address'>{session.ip_address}</span>
                     </div>
                     <div className='device-info'>
@@ -116,11 +119,11 @@ const SessionModal = ({ sessions, onClose, onEndSession, onEndAllSessions }) => 
                         </span>
                       </div>
                       <div className='device-details'>
-                        <span>{session.device_info?.device || 'Noma\'lum'}</span>
+                        <span>{session.device_info?.device || t('sessionModal.unknown')}</span>
                         <span>•</span>
-                        <span>{session.device_info?.os || 'Noma\'lum'}</span>
+                        <span>{session.device_info?.os || t('sessionModal.unknown')}</span>
                         <span>•</span>
-                        <span>{session.device_info?.browser || 'Noma\'lum'}</span>
+                        <span>{session.device_info?.browser || t('sessionModal.unknown')}</span>
                       </div>
                     </div>
                   </div>
@@ -129,9 +132,9 @@ const SessionModal = ({ sessions, onClose, onEndSession, onEndAllSessions }) => 
                     <button 
                       onClick={() => onEndSession(session.id)}
                       className='btn-end-session'
-                      title="Sessionni tugatish"
+                      title={t('sessionModal.endSessionTooltip')}
                     >
-                      🚫 Sessionni Tugatish
+                      🚫 {t('sessionModal.endSession')}
                     </button>
                   </div>
                 </div>
@@ -146,11 +149,11 @@ const SessionModal = ({ sessions, onClose, onEndSession, onEndAllSessions }) => 
               onClick={() => onEndAllSessions()}
               className='btn-end-all'
             >
-              🚫 Barcha Sessionlarni Tugatish
+              🚫 {t('sessionModal.endAllSessions')}
             </button>
           )}
           <button onClick={onClose} className='btn-close-modal'>
-            Yopish
+            {t('sessionModal.close')}
           </button>
         </div>
       </div>

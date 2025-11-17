@@ -2,12 +2,23 @@
 	"header": {
 		"title": "Kir Yuvish Mashinasi",
 		"home": "Bosh Sahifa",
-		"admin": "Admin"
+		"admin": "Admin",
+		"exit": "Chiqish",
+        "logo": "Kir Mashinasi",
+        "toggleMenu": "Menyuni ochish/yopish"
 	},
 	"home": {
 		"title": "Kir Yuvish Mashinasi Bron Tizimi",
 		"subtitle": "Xonangiz raqami bilan ro'yxatdan o'ting va mashinalarni bron qiling",
-		"booking": "Kir yuvish mashinasi bron qilish"
+		"booking": "Kir yuvish mashinasi bron qilish",
+		"room": "Xona",
+		"myBookings": "Mening bronlarim",
+		"loadMachinesError": "Mashinalarni yuklashda xatolik",
+		"loadBookingsError": "Bronlarni yuklashda xatolik",
+		"chooseMachine": "Iltimos, mashina tanlang",
+		"bookingSuccess": "Muvaffaqiyatli bron qilindi!",
+		"bookingError": "Bron qilishda noma'lum xatolik yuz berdi",
+		 "viewAllBookings": "Barcha Bronlarni Ko'rish"
 	},
 	"register": {
 		"title": "Ro'yxatdan O'tish",
@@ -22,7 +33,15 @@
 		"nameLength": "Ism-familiya kamida 5 ta belgidan iborat bo'lishi kerak",
 		"roomFormat": "Xona raqami 3 ta raqamdan iborat bo'lishi kerak",
 		"success": "Muvaffaqiyatli ro'yxatdan o'tdingiz!",
-		 "alreadyRegistered": "Siz allaqachon ro'yxatdan o'tgansiz"
+		 "alreadyRegistered": "Siz allaqachon ro'yxatdan o'tgansiz",
+		 "roomsLoadError": "Xonalar ro'yxatini yuklab bo'lmadi",
+    	"registrationError": "Ro'yxatdan o'tishda xatolik yuz berdi",
+    	"viewBookingsRequired": "Bronlarni ko'rish uchun ism va xona raqamini kiriting",
+    	"userNotRegistered": "Bu ism va xona raqami bilan ro'yxatdan o'tilmagan",
+    	"userNotFound": "Foydalanuvchi mavjud emas yoki xatolik yuz berdi",
+    	"registerButton": "Ro'yxatdan o'tish",
+    	"viewBookingsButton": "Mening bronlarimni ko'rish",
+    	"checking": "Tekshirilmoqda..."
 	},
 	"booking": {
 		"selectDate": "Kunni Tanlang",
@@ -48,7 +67,8 @@
 		"bookedDate": "Bron Qilingan Sana",
 		"cancel": "Bekor Qilish",
 		"cancelSuccess": "Bron muvaffaqiyatli bekor qilindi",
-		"noBookings": "Hozircha bronlar mavjud emas"
+		"noBookings": "Hozircha bronlar mavjud emas",
+		"active": "Faol"
 	},
 	"admin": {
 		"title": "Admin Panel",
@@ -84,7 +104,22 @@
 		"machineAdded": "Mashina muvaffaqiyatli qo'shildi",
 		"machineDeleted": "Mashina muvaffaqiyatli o'chirildi",
 		"machineNameRequired": "Mashina nomini kiriting",
-		"noUsers": "Ro'yxatdan o'tganlar mavjud emas"
+		"noUsers": "Ro'yxatdan o'tganlar mavjud emas",
+		"sessionMonitoring": "🖥️ Session Monitoring",
+		"activeSessions": "Faol Sessionlar",
+		"devices": "Qurilmalar",
+		"viewSessions": "Sessionlarni Ko'rish",
+		"endSessionConfirmation": "Ushbu sessionni o'chirishni istaysizmi?",
+		"endAllSessionsConfirmation": "Barcha sessionlarni o'chirishni istaysizmi?",
+		"endSessionError": "Sessionni o'chirishda xatolik",
+		"endAllSessionsError": "Sessionlarni o'chirishda xatolik",
+		"deleteUserError": "Foydalanuvchini o'chirishda xatolik",
+		"deleteAllUsersError": "Foydalanuvchilarni o'chirishda xatolik",
+		"superAdmin": "Super Admin",
+		"admin": "Admin",
+		"registeredAt": "Ro'yxatdan O'tgan",
+		"noUsersFound": "Foydalanuvchilar Topilmadi",
+		"noUsersMessage": "Hech qanday ro'yxatdan o'tgan foydalanuvchi topilmadi"
 	},
 	"common": {
 		"room": "Xona",
@@ -137,5 +172,41 @@
 		"minLength": "Kamida {{count}} belgi bo'lishi kerak",
 		"maxLength": "Ko'pi bilan {{count}} belgi bo'lishi kerak",
 		"onlyNumbers": "Faqat raqamlar kiritilishi kerak"
-	}
+	},
+	"loading": {
+    "text": "Yuklanmoqda..."
+  },
+  "sessionModal": {
+    "title": "🖥️ Faol Admin Sessionlari",
+    "subtitle": "Barcha faol admin sessionlari va qurilmalar",
+    "totalSessions": "Jami Sessionlar",
+    "uniqueIPs": "Unique IP",
+    "deviceTypes": "Qurilma Turi",
+    "noSessionsTitle": "Faol Sessionlar Topilmadi",
+    "noSessionsMessage": "Hozirda hech qanday faol admin sessioni mavjud emas",
+    "active": "Faol",
+    "loginTime": "🕐 Kirish Vaqti:",
+    "ipAddress": "📍 IP Manzil:",
+    "unknown": "Noma'lum",
+    "endSessionTooltip": "Sessionni tugatish",
+    "endSession": "Sessionni Tugatish",
+    "endAllSessions": "Barcha Sessionlarni Tugatish",
+    "close": "Yopish"
+  },
+  "userBookings": {
+    "accessDenied": "Kirish rad etildi",
+    "accessDeniedMessage": "Ism va xona raqami mos kelmadi yoki sizga ruxsat yo'q.",
+    "backToHome": "Bosh sahifaga qaytish",
+    "fullName": "Ism Familiya",
+    "roomNumber": "Xona raqami",
+    "bookingList": "Bronlar ro'yxati",
+    "noBookings": "Hozircha bronlar mavjud emas",
+    "date": "Sana",
+    "timeSlot": "Vaqt oralig'i",
+    "machineName": "Mashina nomi",
+    "bookedTime": "Bron qilingan vaqt",
+    "verificationError": "Foydalanuvchini tekshirishda xatolik:",
+    "loadBookingsError": "Bronlarni yuklashda xatolik:",
+	"active": "Faol"
+  }
 }

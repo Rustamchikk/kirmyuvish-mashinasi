@@ -1,7 +1,11 @@
+import { useTranslation } from 'react-i18next'
+
 const Loading = () => {
+	const { t } = useTranslation()
+	
 	return (
 		<div className='loading'>
-			<div>Yuklanmoqda...</div>
+			<div>{t('loading.text')}</div>
 		</div>
 	)
 }
