@@ -1,8 +1,7 @@
 // services/api.js
 import axios from 'axios'
 
-const API_BASE_URL =
-	process.env.REACT_APP_API_URL || 'http://localhost:5000/api'
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api'
 
 const api = axios.create({
 	baseURL: API_BASE_URL,
@@ -14,7 +13,6 @@ const api = axios.create({
 export const userAPI = {
 	register: userData => api.post('/users/register', userData),
 	getAll: () => api.get('/users'),
-	// YANGI: Foydalanuvchini tekshirish funksiyasi
 	verifyUser: (roomNumber, fullName) => 
 		api.get('/users/verify', { 
 			params: { 
@@ -22,6 +20,8 @@ export const userAPI = {
 				full_name: fullName 
 			} 
 		}),
+	// YANGI: Mavjud xonalarni olish
+	getAvailableRooms: () => api.get('/users/available-rooms'),
 }
 
 export const bookingAPI = {
@@ -37,5 +37,29 @@ export const machineAPI = {
 	create: data => api.post('/machines', data),
 	delete: id => api.delete(`/machines/${id}`),
 }
+
+export const adminAuthAPI = {
+	login: (username, password) => 
+		api.post('/admin/auth/login', { username, password }),
+}
+
+export const adminMonitoringAPI = {
+  getSessions: (username = null) => 
+    api.get('/admin/monitoring/sessions', { params: { username } }),
+  
+  getSessionStats: (username = null) => 
+    api.get('/admin/monitoring/session-stats', { params: { username } }),
+  
+  endSession: (sessionId) => 
+    api.delete(`/admin/monitoring/sessions/${sessionId}`),
+  
+  endAllSessions: (username) => 
+  api.delete(`/admin/monitoring/sessions?username=${username}`)
+};
+
+export const adminUsersAPI = {
+  deleteUser: (userId) => api.delete(`/admin/users/${userId}`),
+  deleteAllUsers: () => api.delete('/admin/users')
+};
 
 export default api

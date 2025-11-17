@@ -1,0 +1,570 @@
+/* brons.css */
+
+/* brons  */
+.session-monitoring-section {
+    margin-bottom: 2rem;
+}
+
+.session-stats {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.stats-badge {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid #dee2e6;
+    min-width: 120px;
+}
+
+.stat-number {
+    display: block;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #007bff;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.btn-info {
+    background-color: #17a2b8;
+    color: white;
+    border: none;
+    padding: 0.7rem 1.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.btn-info:hover {
+    background-color: #138496;
+}
+
+/* ===== Session Modal ===== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.modal-body {
+    padding: 1.5rem;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #dee2e6;
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+.btn-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #6c757d;
+    padding: 0.25rem;
+    min-width: 30px;
+    min-height: 30px;
+}
+
+.btn-close:hover {
+    color: #495057;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    min-height: 40px;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+/* ===== Sessions Grid ===== */
+.sessions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.session-card {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.session-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.session-user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.user-details {
+    min-width: 0;
+    flex: 1;
+}
+
+.username {
+    font-weight: bold;
+    color: #2c3e50;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+    word-break: break-word;
+}
+
+.session-id {
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+
+.session-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.session-status.active {
+    background: #e8f5e8;
+    color: #2e7d32;
+}
+
+.session-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f8f9fa;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.detail-label {
+    font-weight: 500;
+    color: #5d6d7e;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+.detail-value {
+    color: #2c3e50;
+    font-weight: 500;
+    font-size: 0.85rem;
+    text-align: right;
+    word-break: break-word;
+}
+
+.ip-address {
+    font-family: 'Courier New', monospace;
+    background: #f8f9fa;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+
+.device-info {
+    background: #f8f9fa;
+    padding: 0.75rem;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+}
+
+.device-icons {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+    justify-content: center;
+}
+
+.device-icon {
+    font-size: 1.1rem;
+    cursor: help;
+}
+
+.device-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    font-size: 0.8rem;
+    color: #5d6d7e;
+}
+
+.device-details span {
+    white-space: nowrap;
+}
+
+.session-actions {
+    margin-top: auto;
+}
+
+.btn-end-session {
+    width: 100%;
+    padding: 0.75rem;
+    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9rem;
+    min-height: 44px;
+}
+
+.btn-end-session:hover {
+    background: linear-gradient(135deg, #ff5252, #e53935);
+}
+
+.btn-end-all {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.25rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9rem;
+    min-height: 44px;
+}
+
+.btn-end-all:hover {
+    background: linear-gradient(135deg, #ff5252, #e53935);
+}
+
+/* ===== No Data States ===== */
+.no-sessions, .no-users {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6c757d;
+}
+
+.no-sessions-icon, .no-users-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.no-sessions h4, .no-users h4 {
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+}
+
+.no-sessions p, .no-users p {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* ===== Users Section Improvements ===== */
+.users-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.users-table th {
+    background: #f8f9fa;
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid #dee2e6;
+    white-space: nowrap;
+}
+
+.users-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #dee2e6;
+    vertical-align: top;
+}
+
+.user-name {
+    font-weight: 500;
+    word-break: break-word;
+}
+
+.room-number {
+    font-family: 'Courier New', monospace;
+    background: #f8f9fa;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+}
+
+.registration-date {
+    color: #6c757d;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+.user-actions {
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* ===== Extreme Mobile Responsive ===== */
+@media (max-width: 480px) {
+    .session-stats {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+    
+    .stats-badge {
+        min-width: auto;
+        padding: 0.75rem;
+    }
+    
+    .stat-number {
+        font-size: 1.5rem;
+    }
+    
+    .modal-content {
+        margin: 0.5rem;
+        max-height: 95vh;
+    }
+    
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+        padding: 1rem;
+    }
+    
+    .sessions-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .session-card {
+        padding: 0.75rem;
+        gap: 0.75rem;
+    }
+    
+    .session-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+    
+    .user-avatar {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+    }
+    
+    .session-status {
+        align-self: flex-start;
+    }
+    
+    .detail-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+    
+    .detail-value {
+        text-align: left;
+    }
+    
+    .device-details {
+        flex-direction: column;
+        gap: 0.25rem;
+        align-items: center;
+    }
+    
+    .users-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+    
+    .users-table {
+        font-size: 0.8rem;
+    }
+    
+    .users-table th,
+    .users-table td {
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .btn-info,
+    .btn-end-session,
+    .btn-end-all,
+    .btn-secondary {
+        min-height: 44px;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 320px) {
+    .admin-container {
+        padding: 0.25rem;
+    }
+    
+    .session-card {
+        padding: 0.5rem;
+    }
+    
+    .modal-content {
+        margin: 0.25rem;
+    }
+    
+    .stat-number {
+        font-size: 1.3rem;
+    }
+    
+    .username {
+        font-size: 0.9rem;
+    }
+    
+    .device-icons {
+        gap: 0.5rem;
+    }
+    
+    .device-icon {
+        font-size: 1rem;
+    }
+}
+
+/* ===== Touch Device Optimizations ===== */
+@media (hover: none) and (pointer: coarse) {
+    .btn-info,
+    .btn-end-session,
+    .btn-end-all,
+    .btn-secondary {
+        min-height: 44px;
+    }
+    
+    .session-card {
+        border: 2px solid transparent;
+    }
+    
+    .session-card:active {
+        border-color: #007bff;
+    }
+}
+
+/* ===== High DPI Screens ===== */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .session-card {
+        border-width: 0.5px;
+    }
+    
+    .users-table {
+        border-width: 0.5px;
+    }
+}
+
+/* ===== Print Styles ===== */
+@media print {
+    .modal-overlay {
+        position: static;
+        background: white;
+    }
+    
+    .modal-content {
+        box-shadow: none;
+        border: 1px solid #000;
+    }
+    
+    .btn-info,
+    .btn-end-session,
+    .btn-end-all,
+    .btn-secondary,
+    .btn-close {
+        display: none;
+    }
+}
