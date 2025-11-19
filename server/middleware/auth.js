@@ -5,7 +5,7 @@ exports.requireAdmin = (req, res, next) => {
 	if (!authHeader || !authHeader.startsWith('Basic ')) {
 		return res.status(401).json({
 			success: false,
-			message: 'Admin huquqi talab qilinadi',
+			message: 'error.admin_required',  // 🔥 IMPORTANT
 		})
 	}
 
@@ -18,7 +18,7 @@ exports.requireAdmin = (req, res, next) => {
 	} else {
 		res.status(401).json({
 			success: false,
-			message: "Noto'g'ri login yoki parol",
+			message: 'error.invalid_admin_credentials',  // 🔥 IMPORTANT
 		})
 	}
 }

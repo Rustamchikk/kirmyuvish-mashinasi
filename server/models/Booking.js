@@ -11,7 +11,7 @@ class Booking {
 		)
 
 		if (existingBooking.rows.length > 0) {
-			throw new Error("Bu vaqt oralig'ida mashina band")
+			throw new Error("errors.machine_busy")
 		}
 
 		const result = await pool.query(

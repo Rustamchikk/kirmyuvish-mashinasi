@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const AdminSession = require('../models/AdminSession');
 
-// Helper functions for device detection - BU FUNKSIYALAR ADMINAUTH.JS ICHIDA BO'LISHI KERAK
+// Helper functions
 function getBrowser(userAgent) {
   if (userAgent.includes('Chrome')) return 'Chrome';
   if (userAgent.includes('Firefox')) return 'Firefox';
@@ -26,7 +26,7 @@ function getDevice(userAgent) {
   return 'Desktop';
 }
 
-// Admin ma'lumotlari - .env dan olamiz
+// Admin credentials
 const adminCredentials = {
   [process.env.SUPER_ADMIN_USERNAME]: {
     password: process.env.SUPER_ADMIN_PASSWORD,
@@ -38,14 +38,13 @@ const adminCredentials = {
   }
 };
 
-// Admin login endpoint
+// Admin login
 router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
     const clientIP = req.ip || req.connection.remoteAddress;
     const userAgent = req.get('User-Agent');
 
-    // Device info
     const deviceInfo = {
       userAgent: userAgent,
       browser: getBrowser(userAgent),
@@ -58,29 +57,28 @@ router.post('/login', async (req, res) => {
     if (!admin) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid credentials'
+        message: 'errors.invalid_credentials'
       });
     }
 
-    // Parolni solishtirish
+    // Parol xato
     if (admin.password !== password) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid credentials'
+        message: 'errors.invalid_credentials'
       });
     }
 
     // Session yaratish
     const session = await AdminSession.createSession(
-      username, 
-      deviceInfo, 
+      username,
+      deviceInfo,
       clientIP
     );
 
-    // Login successful
     res.json({
       success: true,
-      message: 'Login successful',
+      message: 'success.admin_login',
       adminType: admin.type,
       username: username,
       sessionId: session.id
@@ -90,7 +88,7 @@ router.post('/login', async (req, res) => {
     console.error('Admin login error:', error);
     res.status(500).json({
       success: false,
-      message: 'Server error'
+      message: 'errors.server_error'
     });
   }
 });
