@@ -1,44 +1,42 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
-// Environment variable tekshirish
 if (!process.env.POSTGRES_URL) {
     console.error("❌ Error: POSTGRES_URL is not set in environment variables");
     console.log("Available environment variables:", Object.keys(process.env));
-    // process.exit(1); // Vercelda exit qilma, faqat log qil
 }
 
+// Aiven uchun SSL sozlamalari
 const pool = new Pool({
     connectionString: process.env.POSTGRES_URL,
-    ssl: { 
-        rejectUnauthorized: false 
+    ssl: {
+        rejectUnauthorized: false // Aiven self-signed certificate uchun
     },
-    // Connection settings qo'shing
     connectionTimeoutMillis: 10000,
     idleTimeoutMillis: 30000,
-    max: 20
+    max: 10
 });
 
 // Connection test function
 const testConnection = async () => {
+    let client;
     try {
-        const client = await pool.connect();
+        client = await pool.connect();
         const result = await client.query('SELECT NOW()');
-        console.log('✅ PostgreSQL connected successfully (Aiven, URL)');
+        console.log('✅ PostgreSQL connected successfully (Aiven)');
         console.log('Database time:', result.rows[0].now);
-        client.release();
         return true;
     } catch (err) {
         console.error('❌ PostgreSQL connection error:', err.message);
-        console.error('Connection string:', process.env.POSTGRES_URL ? 'Exists' : 'Missing');
+        console.error('Error code:', err.code);
         return false;
+    } finally {
+        if (client) client.release();
     }
 };
 
 // Ilova ishga tushganda connection ni test qilish
-if (process.env.NODE_ENV !== 'production') {
-    testConnection();
-}
+testConnection();
 
 module.exports = {
     pool,

@@ -26,21 +26,23 @@ app.get('/favicon.ico', (req, res) => {
     res.status(204).end();
 });
 
-// Database connection middleware
-app.use(async (req, res, next) => {
-    try {
-        // Har bir request dan oldin connection ni tekshirish
-        await pool.query('SELECT 1');
-        next();
-    } catch (error) {
-        console.error('Database connection lost:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Database connection error',
-            error: process.env.NODE_ENV === 'production' ? 'Internal server error' : error.message
-        });
-    }
+app.get('/favicon.png', (req, res) => {
+    res.status(204).end();
 });
+
+// VAQTINCHA database middleware ni o'chiring
+// app.use(async (req, res, next) => {
+//     try {
+//         await pool.query('SELECT 1');
+//         next();
+//     } catch (error) {
+//         console.error('Database connection lost:', error);
+//         res.status(500).json({ 
+//             success: false, 
+//             message: 'Database connection error'
+//         });
+//     }
+// });
 
 // Asosiy route
 app.get('/', (req, res) => {
@@ -55,25 +57,22 @@ app.get('/', (req, res) => {
 app.get('/api/test-db', async (req, res) => {
     try {
         const result = await pool.query('SELECT NOW()');
-        const connectionResult = await testConnection();
-        
         res.json({ 
             success: true, 
             time: result.rows[0].now,
-            connection: connectionResult ? 'OK' : 'FAILED',
-            environment: process.env.NODE_ENV || 'not set'
+            message: 'Database connected successfully'
         });
     } catch (error) {
         console.error('Database test error:', error);
         res.status(500).json({ 
             success: false, 
             error: error.message,
-            connectionString: process.env.POSTGRES_URL ? 'Exists' : 'Missing'
+            code: error.code
         });
     }
 });
 
-// Boshqa routelar...
+// Boshqa routelar - database bilan ishlaydiganlar
 app.use('/api/users', require('./routes/users'))
 app.use('/api/bookings', require('./routes/bookings'))
 app.use('/api/machines', require('./routes/machines'))
@@ -84,15 +83,5 @@ app.use('/api/admin', require('./routes/adminUsers'))
 app.get('/api/health', (req, res) => {
     res.json({ success: true, message: "Server is running" })
 })
-
-// Error handling
-app.use((err, req, res, next) => {
-    console.error('Server error:', err);
-    res.status(500).json({ 
-        success: false, 
-        message: 'Internal server error',
-        ...(process.env.NODE_ENV !== 'production' && { error: err.message })
-    });
-});
 
 module.exports = app;
