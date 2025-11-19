@@ -7,8 +7,7 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "init-db": "node config/initDatabase.js",
-    "build": "echo 'No build process needed for Node.js backend' && exit 0",
-    "vercel-build": "npm run build"
+    "build": "echo 'No build process needed for Node.js backend' && exit 0"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -19,12 +18,10 @@
     "helmet": "^7.0.0",
     "jsonwebtoken": "^9.0.2",
     "node-cron": "^3.0.2",
-    "pg": "^8.16.3"
+    "pg": "^8.16.3",
+    "serverless-http": "^4.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
-  },
-  "engines": {
-    "node":"20.x"
   }
 }

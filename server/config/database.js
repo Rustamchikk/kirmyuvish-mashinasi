@@ -1,44 +1,34 @@
-const { Pool } = require('pg');
-require('dotenv').config();
+const { Pool } = require('pg')
+require('dotenv').config()
 
-if (!process.env.POSTGRES_URL) {
-    console.error("❌ Error: POSTGRES_URL is not set in environment variables");
-    console.log("Available environment variables:", Object.keys(process.env));
+const requiredEnv = ['DB_USER', 'DB_PASSWORD', 'DB_HOST', 'DB_NAME', 'DB_PORT']
+for (const envVar of requiredEnv) {
+    if (!process.env[envVar]) {
+        console.error(`❌ Error: ${envVar} is not set in .env`)
+        process.exit(1)
+    }
 }
 
-// Aiven uchun SSL sozlamalari
 const pool = new Pool({
-    connectionString: process.env.POSTGRES_URL,
-    ssl: {
-        rejectUnauthorized: false // Aiven self-signed certificate uchun
-    },
-    connectionTimeoutMillis: 10000,
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    database: process.env.DB_NAME,
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT,
+    max: 20,
     idleTimeoutMillis: 30000,
-    max: 10
-});
+    connectionTimeoutMillis: 10000, // 10s – uzoq ulanishlar uchun
+    ssl: { rejectUnauthorized: false } // Aiven talab qiladi
+})
 
-// Connection test function
-const testConnection = async () => {
-    let client;
+;(async () => {
     try {
-        client = await pool.connect();
-        const result = await client.query('SELECT NOW()');
-        console.log('✅ PostgreSQL connected successfully (Aiven)');
-        console.log('Database time:', result.rows[0].now);
-        return true;
+        await pool.query('SELECT NOW()')
+        console.log('✅ PostgreSQL connected successfully (Aiven)')
     } catch (err) {
-        console.error('❌ PostgreSQL connection error:', err.message);
-        console.error('Error code:', err.code);
-        return false;
-    } finally {
-        if (client) client.release();
+        console.error('❌ PostgreSQL connection error:', err)
+        process.exit(1)
     }
-};
+})()
 
-// Ilova ishga tushganda connection ni test qilish
-testConnection();
-
-module.exports = {
-    pool,
-    testConnection
-};
+module.exports = pool
