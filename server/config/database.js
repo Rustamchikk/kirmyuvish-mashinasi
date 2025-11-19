@@ -1,7 +1,6 @@
 const { Pool } = require('pg')
 
-// Vercel uchun POSTGRES_URL dan foydalanish
-const connectionString = process.env.POSTGRES_URL;
+const connectionString = process.env.POSTGRES_URL
 
 if (!connectionString) {
   console.error('❌ Error: POSTGRES_URL is not set')
@@ -9,12 +8,9 @@ if (!connectionString) {
 }
 
 const pool = new Pool({
-  connectionString: connectionString,
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 10000,
-  ssl: { rejectUnauthorized: false } // Aiven SSL talab qiladi
-});
+  connectionString,
+  ssl: { rejectUnauthorized: false }
+})
 
 // Ulanishni tekshirish
 (async () => {
