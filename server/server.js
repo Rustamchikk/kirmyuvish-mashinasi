@@ -13,6 +13,9 @@ const db = require('./config/database')
 
 const app = express()
 
+// ✅ MUHIM: Trust proxy qo'shing (Vercel uchun)
+app.set('trust proxy', 1)
+
 // Middleware
 app.use(helmet())
 app.use(cors({
@@ -24,7 +27,7 @@ app.use(cors({
 }))
 app.use(express.json())
 
-// Rate limiting
+// Rate limiting - ENDI ISHLAYDI
 const limiter = rateLimit({
   windowMs: (process.env.RATE_LIMIT_WINDOW_MINUTES || 15) * 60 * 1000,
   max: process.env.RATE_LIMIT_MAX || 100,
@@ -33,22 +36,35 @@ const limiter = rateLimit({
 })
 app.use(limiter)
 
-// ✅ ROOT ROUTE - BU MUAMMONI HAL QILADI
+// ✅ ROOT ROUTE
 app.get('/', (req, res) => {
   res.json({
     success: true,
     message: 'Washing Machine Booking API is running! 🚀',
     version: '1.0.0',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development',
-    endpoints: {
-      health: '/api/health',
-      users: '/api/users',
-      bookings: '/api/bookings',
-      machines: '/api/machines',
-      admin: '/api/admin/auth/login'
-    }
+    environment: process.env.NODE_ENV || 'development'
   })
+})
+
+// ✅ HEALTH CHECK
+app.get('/api/health', async (req, res) => {
+  try {
+    await db.query('SELECT NOW()')
+    res.json({
+      success: true,
+      message: 'Server is running',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV,
+      database: 'Connected'
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Database connection failed',
+      error: error.message
+    })
+  }
 })
 
 // Routes
@@ -61,35 +77,7 @@ try {
   app.use('/api/admin', require('./routes/adminUsers'));
 } catch (err) {
   console.error('Route import error:', err)
-  process.exit(1)
-}
-
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({
-    success: true,
-    message: 'Server is running',
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV,
-    database: 'Connected'
-  })
-})
-
-// Vercel serverless muhitida cron job ishlamasligi mumkin
-if (process.env.NODE_ENV !== 'production') {
-  const cron = require('node-cron')
-  cron.schedule('0 23 * * 0', async () => {
-    try {
-      const lastWeek = new Date()
-      lastWeek.setDate(lastWeek.getDate() - 7)
-      await db.query('DELETE FROM bookings WHERE booking_date < $1', [
-        lastWeek.toISOString().split('T')[0],
-      ])
-      console.log('✅ Weekly cleanup completed')
-    } catch (error) {
-      console.error('❌ Weekly cleanup error:', error)
-    }
-  })
+  // process.exit(1) // <- BUNI OLIB TASHLANG, server crash qilmasin
 }
 
 // Error handling
@@ -116,7 +104,6 @@ const PORT = process.env.PORT || 5001
 if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => {
     console.log(`✅ Server is running on port ${PORT}`)
-    console.log(`🔗 Health check: http://localhost:${PORT}/api/health`)
   })
 }
 
