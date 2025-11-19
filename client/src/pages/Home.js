@@ -137,8 +137,6 @@ const Home = () => {
     return Array.from({ length: 5 }, (_, i) => addDays(start, i))
   }
 
-  // "Mening bronlarim" tugmasi uchun funksiya (OLIB TASHLANDI)
-
   // Agar foydalanuvchi authenticated bo'lmasa, register ko'rsatiladi
   if (!isAuthenticated || !userRoom) {
     return (

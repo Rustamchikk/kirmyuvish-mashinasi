@@ -7,7 +7,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
 
 const Register = ({ onRegister }) => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { login } = useAuth()
   const navigate = useNavigate()
   const [user, setUser] = useState({ full_name: '', room_number: '' })
@@ -15,6 +15,39 @@ const Register = ({ onRegister }) => {
   const [loading, setLoading] = useState(false)
   const [availableRooms, setAvailableRooms] = useState([])
   const [roomsLoading, setRoomsLoading] = useState(true)
+
+  // 🔧 SERVER ERROR KEY NORMALIZER
+  const resolveServerKey = (rawKey) => {
+    if (!rawKey || typeof rawKey !== "string") return null;
+  
+    const key = rawKey.trim();
+  
+    // 1) Key aynan mavjud bo‘lsa
+    if (i18n.exists(key)) return key;
+  
+    // 2) errors.xxx → error.xxx
+    if (key.startsWith("errors.")) {
+      const rest = key.slice("errors.".length);
+      const alt = `error.${rest}`;
+      if (i18n.exists(alt)) return alt;
+    }
+  
+    // 3) error.xxx → errors.xxx
+    if (key.startsWith("error.")) {
+      const rest = key.slice("error.".length);
+      const alt = `errors.${rest}`;
+      if (i18n.exists(alt)) return alt;
+    }
+  
+    // 4) Ba’zan backend faqat room_not_exist yuboradi
+    const alt1 = `error.${key}`;
+    if (i18n.exists(alt1)) return alt1;
+  
+    const alt2 = `errors.${key}`;
+    if (i18n.exists(alt2)) return alt2;
+  
+    return null;
+  };
 
   // Komponent yuklanganda mavjud xonalarni olish
   useEffect(() => {
@@ -44,7 +77,6 @@ const Register = ({ onRegister }) => {
   const handleSubmit = async e => {
     e.preventDefault()
 
-    // Asosiy frontend validatsiya
     if (!user.full_name.trim()) {
       showAlert('error', t('register.nameRequired'))
       return
@@ -59,15 +91,25 @@ const Register = ({ onRegister }) => {
 
     try {
       const response = await userAPI.register(user)
-      
+
       if (response.data.success) {
-        showAlert('success', response.data.message)
+        const rawKey = response.data.message
+        const resolved = resolveServerKey(rawKey)
+
+        showAlert('success', resolved ? t(resolved) : rawKey)
+
         login(user.room_number, user.full_name)
         onRegister(user.room_number)
       }
     } catch (error) {
-      // Backenddan kelgan xatolik xabarini ko'rsatish
-      const errorMessage = error.response?.data?.message || t('register.registrationError')
+      console.log("REGISTER ERROR RAW:", error)
+      console.log("REGISTER ERROR DATA:", error.response?.data)
+      console.log("REGISTER MESSAGE:", error.response?.data?.message)
+
+      const rawKey = error.response?.data?.message
+      const resolved = resolveServerKey(rawKey)
+      const errorMessage = resolved ? t(resolved) : t('register.registrationError')
+
       showAlert('error', errorMessage)
     } finally {
       setLoading(false)
@@ -85,16 +127,25 @@ const Register = ({ onRegister }) => {
     setLoading(true)
     try {
       const response = await userAPI.verifyUser(user.room_number, user.full_name)
-      
+
       if (response.data.success && response.data.exists) {
         login(user.room_number, user.full_name)
         navigate(`/bookings/${user.room_number}`)
       } else {
-        showAlert('error', response.data.message || t('register.userNotRegistered'))
+        const rawKey = response.data.message
+        const resolved = resolveServerKey(rawKey)
+
+        showAlert('error', resolved ? t(resolved) : t('register.userNotRegistered'))
       }
     } catch (error) {
-      console.error('Foydalanuvchini tekshirishda xatolik:', error)
-      const errorMessage = error.response?.data?.message || t('register.userNotFound')
+      console.log("VERIFY ERROR RAW:", error)
+      console.log("VERIFY ERROR DATA:", error.response?.data)
+      console.log("VERIFY MESSAGE:", error.response?.data?.message)
+
+      const rawKey = error.response?.data?.message
+      const resolved = resolveServerKey(rawKey)
+      const errorMessage = resolved ? t(resolved) : t('register.userNotFound')
+
       showAlert('error', errorMessage)
     } finally {
       setLoading(false)

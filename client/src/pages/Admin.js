@@ -18,7 +18,7 @@ import {
 import { useAuth } from '../contexts/AuthContext'
 
 const Admin = () => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { adminLogin } = useAuth()
 
   const [users, setUsers] = useState([])
@@ -39,6 +39,33 @@ const Admin = () => {
   const [sessionStats, setSessionStats] = useState(null)
   const [showSessionModal, setShowSessionModal] = useState(false)
   const [refreshTrigger, setRefreshTrigger] = useState(0)
+
+  // 🔧 SERVER ERROR KEY NORMALIZER
+  const resolveServerKey = (key) => {
+    if (!key || typeof key !== "string") return null;
+
+    key = key.trim();
+
+    if (i18n.exists(key)) return key;
+
+    // errors.xxx → error.xxx
+    if (key.startsWith("errors.")) {
+      const alt = "error." + key.slice(7);
+      if (i18n.exists(alt)) return alt;
+    }
+
+    // error.xxx → errors.xxx
+    if (key.startsWith("error.")) {
+      const alt = "errors." + key.slice(6);
+      if (i18n.exists(alt)) return alt;
+    }
+
+    // fallback
+    if (i18n.exists("errors." + key)) return "errors." + key;
+    if (i18n.exists("error." + key)) return "error." + key;
+
+    return null;
+  };
 
   // Backend orqali login
   const handleLogin = async e => {
@@ -64,7 +91,9 @@ const Admin = () => {
         }
       }
     } catch (error) {
-      const message = error.response?.data?.message || t('admin.invalidCredentials')
+      const rawKey = error.response?.data?.message;
+      const resolved = resolveServerKey(rawKey);
+      const message = resolved ? t(resolved) : t('admin.invalidCredentials');
       showAlert('error', message)
     } finally {
       setLoading(false)
@@ -86,8 +115,11 @@ const Admin = () => {
       setUsers(usersRes.data.data)
       setBookings(bookingsRes.data.data)
       setMachines(machinesRes.data.data)
-    } catch {
-      showAlert('error', t('error.serverError'))
+    } catch (error) {
+      const rawKey = error.response?.data?.message;
+      const resolved = resolveServerKey(rawKey);
+      const message = resolved ? t(resolved) : t('error.serverError');
+      showAlert('error', message)
     } finally {
       setLoading(false)
     }
@@ -107,6 +139,10 @@ const Admin = () => {
       setSessionStats(statsRes.data.data)
     } catch (error) {
       console.error('Session data load error:', error)
+      const rawKey = error.response?.data?.message;
+      const resolved = resolveServerKey(rawKey);
+      const message = resolved ? t(resolved) : t('error.serverError');
+      showAlert('error', message)
       setSessions([])
     }
   }
@@ -122,8 +158,11 @@ const Admin = () => {
       await bookingAPI.delete(id)
       showAlert('success', t('booking.cancelSuccess'))
       loadData()
-    } catch {
-      showAlert('error', t('error.cancelBooking'))
+    } catch (error) {
+      const rawKey = error.response?.data?.message;
+      const resolved = resolveServerKey(rawKey);
+      const message = resolved ? t(resolved) : t('error.cancelBooking');
+      showAlert('error', message)
     }
   }
 
@@ -132,8 +171,11 @@ const Admin = () => {
       await machineAPI.update(id, { is_active: !isActive })
       showAlert('success', t('admin.machineStatusUpdated'))
       loadData()
-    } catch {
-      showAlert('error', t('error.updateMachine'))
+    } catch (error) {
+      const rawKey = error.response?.data?.message;
+      const resolved = resolveServerKey(rawKey);
+      const message = resolved ? t(resolved) : t('error.updateMachine');
+      showAlert('error', message)
     }
   }
 
@@ -162,7 +204,9 @@ const Admin = () => {
         showAlert('success', response.data.message)
       }
     } catch (error) {
-      const message = error.response?.data?.message || t('admin.endSessionError')
+      const rawKey = error.response?.data?.message;
+      const resolved = resolveServerKey(rawKey);
+      const message = resolved ? t(resolved) : t('admin.endSessionError');
       showAlert('error', message)
     }
   }
@@ -189,7 +233,9 @@ const Admin = () => {
         showAlert('success', response.data.message)
       }
     } catch (error) {
-      const message = error.response?.data?.message || t('admin.endAllSessionsError')
+      const rawKey = error.response?.data?.message;
+      const resolved = resolveServerKey(rawKey);
+      const message = resolved ? t(resolved) : t('admin.endAllSessionsError');
       showAlert('error', message)
     }
   }
@@ -203,7 +249,10 @@ const Admin = () => {
       showAlert('success', t('admin.userDeleted'))
       loadData()
     } catch (error) {
-      showAlert('error', t('admin.deleteUserError'))
+      const rawKey = error.response?.data?.message;
+      const resolved = resolveServerKey(rawKey);
+      const message = resolved ? t(resolved) : t('admin.deleteUserError');
+      showAlert('error', message)
     }
   }
 
@@ -216,7 +265,10 @@ const Admin = () => {
       showAlert('success', t('admin.allUsersDeleted'))
       loadData()
     } catch (error) {
-      showAlert('error', t('admin.deleteAllUsersError'))
+      const rawKey = error.response?.data?.message;
+      const resolved = resolveServerKey(rawKey);
+      const message = resolved ? t(resolved) : t('admin.deleteAllUsersError');
+      showAlert('error', message)
     }
   }
 
