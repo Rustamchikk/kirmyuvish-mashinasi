@@ -1,17 +1,13 @@
 const express = require('express')
 const cors = require('cors')
 const helmet = require('helmet')
-const rateLimit = require('express-rate-limit')
 require('dotenv').config()
 
-const db = require('./config/database')
-
-const Booking = require('./models/Booking')
-const WeeklyLimit = require('./models/WeeklyLimit')
+const { pool, testConnection } = require('./config/database')
 
 const app = express()
 
-// MUHIM: Trust proxy qo'shing (Vercel uchun)
+// Vercel uchun trust proxy
 app.set('trust proxy', 1)
 
 app.use(helmet())
@@ -25,13 +21,28 @@ app.use(cors({
 }))
 app.use(express.json())
 
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 200,
-})
-app.use(limiter)
+// Favicon xatosini oldini olish
+app.get('/favicon.ico', (req, res) => {
+    res.status(204).end();
+});
 
-// ASOSIY ROUTE QO'SHING
+// Database connection middleware
+app.use(async (req, res, next) => {
+    try {
+        // Har bir request dan oldin connection ni tekshirish
+        await pool.query('SELECT 1');
+        next();
+    } catch (error) {
+        console.error('Database connection lost:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Database connection error',
+            error: process.env.NODE_ENV === 'production' ? 'Internal server error' : error.message
+        });
+    }
+});
+
+// Asosiy route
 app.get('/', (req, res) => {
     res.json({ 
         success: true, 
@@ -40,6 +51,29 @@ app.get('/', (req, res) => {
     })
 })
 
+// Database test route
+app.get('/api/test-db', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT NOW()');
+        const connectionResult = await testConnection();
+        
+        res.json({ 
+            success: true, 
+            time: result.rows[0].now,
+            connection: connectionResult ? 'OK' : 'FAILED',
+            environment: process.env.NODE_ENV || 'not set'
+        });
+    } catch (error) {
+        console.error('Database test error:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: error.message,
+            connectionString: process.env.POSTGRES_URL ? 'Exists' : 'Missing'
+        });
+    }
+});
+
+// Boshqa routelar...
 app.use('/api/users', require('./routes/users'))
 app.use('/api/bookings', require('./routes/bookings'))
 app.use('/api/machines', require('./routes/machines'))
@@ -51,4 +85,14 @@ app.get('/api/health', (req, res) => {
     res.json({ success: true, message: "Server is running" })
 })
 
-module.exports = app
+// Error handling
+app.use((err, req, res, next) => {
+    console.error('Server error:', err);
+    res.status(500).json({ 
+        success: false, 
+        message: 'Internal server error',
+        ...(process.env.NODE_ENV !== 'production' && { error: err.message })
+    });
+});
+
+module.exports = app;
