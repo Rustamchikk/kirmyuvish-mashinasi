@@ -11,6 +11,9 @@ const WeeklyLimit = require('./models/WeeklyLimit')
 
 const app = express()
 
+// MUHIM: Trust proxy qo'shing (Vercel uchun)
+app.set('trust proxy', 1)
+
 app.use(helmet())
 app.use(cors({
     origin: [
