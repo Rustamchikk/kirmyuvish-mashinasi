@@ -28,6 +28,15 @@ const limiter = rateLimit({
 })
 app.use(limiter)
 
+// ASOSIY ROUTE QO'SHING
+app.get('/', (req, res) => {
+    res.json({ 
+        success: true, 
+        message: "Washing Machine Booking API is running",
+        version: "1.0.0"
+    })
+})
+
 app.use('/api/users', require('./routes/users'))
 app.use('/api/bookings', require('./routes/bookings'))
 app.use('/api/machines', require('./routes/machines'))
