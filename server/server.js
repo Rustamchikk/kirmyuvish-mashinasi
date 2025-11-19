@@ -15,7 +15,14 @@ const app = express()
 
 // Middleware
 app.use(helmet())
-app.use(cors())
+app.use(cors({
+    origin: [
+        "https://kirmyuvish-mashinasi.vercel.app", // frontend
+        "http://localhost:3000" // local development (ixtiyoriy)
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+}))
 app.use(express.json())
 
 // Rate limiting
