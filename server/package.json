@@ -8,7 +8,7 @@
     "dev": "nodemon server.js",
     "init-db": "node config/initDatabase.js",
     "build": "echo 'No build process needed for Node.js backend' && exit 0",
-    "vercel-build": "echo 'Building for Vercel'"
+    "vercel-build": "npm run build"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
