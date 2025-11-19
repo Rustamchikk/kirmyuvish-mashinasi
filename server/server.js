@@ -33,6 +33,24 @@ const limiter = rateLimit({
 })
 app.use(limiter)
 
+// ✅ ROOT ROUTE - BU MUAMMONI HAL QILADI
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Washing Machine Booking API is running! 🚀',
+    version: '1.0.0',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    endpoints: {
+      health: '/api/health',
+      users: '/api/users',
+      bookings: '/api/bookings',
+      machines: '/api/machines',
+      admin: '/api/admin/auth/login'
+    }
+  })
+})
+
 // Routes
 try {
   app.use('/api/users', require('./routes/users'))
@@ -58,7 +76,6 @@ app.get('/api/health', (req, res) => {
 })
 
 // Vercel serverless muhitida cron job ishlamasligi mumkin
-// Shu uchun uni conditional qilamiz
 if (process.env.NODE_ENV !== 'production') {
   const cron = require('node-cron')
   cron.schedule('0 23 * * 0', async () => {
@@ -93,10 +110,9 @@ app.use('*', (req, res) => {
   })
 })
 
-// Server port - Vercel PORT environment variable dan foydalanish
+// Server port
 const PORT = process.env.PORT || 5001
 
-// Faqat localda listen qilish, Vercel o'zi boshqaradi
 if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => {
     console.log(`✅ Server is running on port ${PORT}`)
