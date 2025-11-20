@@ -16,6 +16,44 @@ const AVAILABLE_ROOMS = (() => {
   return rooms
 })()
 
+// ✅ YANGI: LOGIN FUNCTION
+exports.login = async (req, res) => {
+  try {
+    const { room_number, full_name } = req.body
+
+    if (!full_name || !full_name.trim()) {
+      return res.status(400).json({ success: false, message: "errors.fullname_required" })
+    }
+
+    if (!room_number || !room_number.trim()) {
+      return res.status(400).json({ success: false, message: "errors.room_required" })
+    }
+
+    const user = await User.findByRoom(room_number.trim())
+
+    if (user && user.full_name === full_name.trim()) {
+      return res.json({
+        success: true,
+        message: "success.login_success",
+        data: {
+          id: user.id,
+          full_name: user.full_name,
+          room_number: user.room_number
+        }
+      })
+    } else {
+      return res.status(401).json({
+        success: false,
+        message: "errors.invalid_credentials"
+      })
+    }
+
+  } catch (error) {
+    console.error("User login error:", error)
+    res.status(500).json({ success: false, message: "errors.server_error" })
+  }
+}
+
 exports.register = async (req, res) => {
   try {
     const { full_name, room_number } = req.body
@@ -71,7 +109,6 @@ exports.register = async (req, res) => {
     res.status(500).json({ success: false, message: "errors.server_error" })
   }
 }
-
 
 exports.getAllUsers = async (req, res) => {
   try {

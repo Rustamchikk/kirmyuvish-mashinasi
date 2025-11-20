@@ -4,8 +4,9 @@ const router = express.Router()
 const userController = require('../controllers/userController')
 
 router.post('/register', userController.register)
+router.post('/login', userController.login) // ✅ LOGIN QO'SHING
 router.get('/', userController.getAllUsers)
-router.get('/available-rooms', userController.getAvailableRooms) // YANGI
+router.get('/available-rooms', userController.getAvailableRooms)
 router.get('/verify', userController.verifyUser)
 
 module.exports = router
