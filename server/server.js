@@ -12,7 +12,7 @@ const Booking = require('./models/Booking')
 const WeeklyLimit = require('./models/WeeklyLimit')
 
 const app = express()
-
+app.set('trust proxy', 1)
 // Middleware
 app.use(helmet())
 app.use(cors())
@@ -89,6 +89,6 @@ app.use('*', (req, res) => {
 const PORT = process.env.PORT
 app.listen(PORT, () => {
     console.log(`✅ Server is running on port ${PORT}`)
-    // console.log(`🔗 Health check: http://localhost:${PORT}/api/health`)
-    // console.log(`🔗 Admin auth: http://localhost:${PORT}/api/admin/auth/login`)
+     console.log(`🔗 Health check: http://localhost:${PORT}/api/health`)
+    console.log(`🔗 Admin auth: http://localhost:${PORT}/api/admin/auth/login`)
 })
