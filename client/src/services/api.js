@@ -4,66 +4,62 @@ import axios from 'axios'
 const API_BASE_URL = process.env.REACT_APP_API_URL 
 console.log("API BASE URL:", process.env.REACT_APP_API_URL);
 
-
-
 const api = axios.create({
 	baseURL: API_BASE_URL, 
 	headers: {
 		'Content-Type': 'application/json',
 	},
-	
 })
 
 export const userAPI = {
-	register: userData => api.post('/users/register', userData),
-	getAll: () => api.get('/users'),
+	register: userData => api.post('/api/users/register', userData), // ✅ /api/ qo'shildi
+	getAll: () => api.get('/api/users'), // ✅ /api/ qo'shildi
 	verifyUser: (roomNumber, fullName) => 
-		api.get('/users/verify', { 
+		api.get('/api/users/verify', { // ✅ /api/ qo'shildi
 			params: { 
 				room_number: roomNumber, 
 				full_name: fullName 
 			} 
 		}),
-	// YANGI: Mavjud xonalarni olish
-	getAvailableRooms: () => api.get('/users/available-rooms'),
+	getAvailableRooms: () => api.get('/api/users/available-rooms'), // ✅ /api/ qo'shildi
 }
 
 export const bookingAPI = {
-	create: bookingData => api.post('/bookings', bookingData),
-	getAll: (date = null) => api.get('/bookings', { params: { date } }),
-	getUserBookings: roomNumber => api.get(`/bookings/user/${roomNumber}`),
-	delete: id => api.delete(`/bookings/${id}`),
+	create: bookingData => api.post('/api/bookings', bookingData), // ✅ /api/ qo'shildi
+	getAll: (date = null) => api.get('/api/bookings', { params: { date } }), // ✅ /api/ qo'shildi
+	getUserBookings: roomNumber => api.get(`/api/bookings/user/${roomNumber}`), // ✅ /api/ qo'shildi
+	delete: id => api.delete(`/api/bookings/${id}`), // ✅ /api/ qo'shildi
 }
 
 export const machineAPI = {
-	getAll: () => api.get('/machines'),
-	update: (id, data) => api.patch(`/machines/${id}`, data),
-	create: data => api.post('/machines', data),
-	delete: id => api.delete(`/machines/${id}`),
+	getAll: () => api.get('/api/machines'), // ✅ /api/ qo'shildi
+	update: (id, data) => api.patch(`/api/machines/${id}`, data), // ✅ /api/ qo'shildi
+	create: data => api.post('/api/machines', data), // ✅ /api/ qo'shildi
+	delete: id => api.delete(`/api/machines/${id}`), // ✅ /api/ qo'shildi
 }
 
 export const adminAuthAPI = {
 	login: (username, password) => 
-		api.post('/admin/auth/login', { username, password }),
+		api.post('/api/admin/auth/login', { username, password }), // ✅ /api/ qo'shildi
 }
 
 export const adminMonitoringAPI = {
   getSessions: (username = null) => 
-    api.get('/admin/monitoring/sessions', { params: { username } }),
+    api.get('/api/admin/monitoring/sessions', { params: { username } }), // ✅ /api/ qo'shildi
   
   getSessionStats: (username = null) => 
-    api.get('/admin/monitoring/session-stats', { params: { username } }),
+    api.get('/api/admin/monitoring/session-stats', { params: { username } }), // ✅ /api/ qo'shildi
   
   endSession: (sessionId) => 
-    api.delete(`/admin/monitoring/sessions/${sessionId}`),
+    api.delete(`/api/admin/monitoring/sessions/${sessionId}`), // ✅ /api/ qo'shildi
   
   endAllSessions: (username) => 
-  api.delete(`/admin/monitoring/sessions?username=${username}`)
+  api.delete(`/api/admin/monitoring/sessions?username=${username}`) // ✅ /api/ qo'shildi
 };
 
 export const adminUsersAPI = {
-  deleteUser: (userId) => api.delete(`/admin/users/${userId}`),
-  deleteAllUsers: () => api.delete('/admin/users')
+  deleteUser: (userId) => api.delete(`/api/admin/users/${userId}`), // ✅ /api/ qo'shildi
+  deleteAllUsers: () => api.delete('/api/admin/users') // ✅ /api/ qo'shildi
 };
 
 export default api

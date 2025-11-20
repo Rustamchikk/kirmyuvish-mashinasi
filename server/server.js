@@ -91,4 +91,45 @@ app.get('/api/health', (req, res) => {
     })
 })
 
-// Cron job va qolgan kod...
+// Cron job
+const cron = require('node-cron')
+cron.schedule('0 23 * * 0', async () => {
+    try {
+        const lastWeek = new Date()
+        lastWeek.setDate(lastWeek.getDate() - 7)
+        await db.query('DELETE FROM bookings WHERE booking_date < $1', [
+            lastWeek.toISOString().split('T')[0],
+        ])
+        await WeeklyLimit.resetWeeklyLimits()
+        console.log('✅ Weekly cleanup completed')
+    } catch (error) {
+        console.error('❌ Weekly cleanup error:', error)
+    }
+})
+
+// Error handling
+app.use((err, req, res, next) => {
+    console.error('❌ Error:', err.stack)
+    res.status(500).json({
+        success: false,
+        message: 'Something went wrong!',
+    })
+})
+
+// 404 handling
+app.use((req, res) => {
+    res.status(404).json({
+        success: false,
+        message: 'Route not found',
+        requestedUrl: req.originalUrl
+    })
+})
+
+// Server port
+const PORT = process.env.PORT || 5001
+console.log(`🔄 Server starting on port ${PORT}...`);
+
+app.listen(PORT, () => {
+    console.log(`✅ Server is running on port ${PORT}`)
+    console.log(`🔗 Health check: http://localhost:${PORT}/api/health`)
+})
