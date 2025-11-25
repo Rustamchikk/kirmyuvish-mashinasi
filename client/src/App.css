@@ -584,7 +584,7 @@ main {
 }
 
 .system-scope:hover {
-  background: rgba(252, 252, 248, 0.2);
+  background: rgba(255, 255, 255, 0.2);
   transition: all 0.3s ease;
 }
 
@@ -602,7 +602,136 @@ main {
     width: 100%;
   }
   
-  .footer-info {
+  .footer-main-info {
+    text-align: center;
+  }
+  
+  .system-scope {
+    display: inline-block;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-footer {
+    padding: 20px 0;
+  }
+  
+  .footer-content {
+    padding: 0 15px;
+    gap: 15px;
+  }
+  
+  .system-description,
+  .system-scope,
+  .copyright,
+  .contact-item {
+    font-size: 13px;
+  }
+  
+  .contact-item {
+    justify-content: center;
+  }
+}
+
+/* Juda kichik ekranlar uchun */
+@media (max-width: 360px) {
+  .app-footer {
+    padding: 15px 0;
+  }
+  
+  .footer-content {
+    padding: 0 10px;
+  }
+  
+  .system-description,
+  .system-scope,
+  .copyright,
+  .contact-item {
+    font-size: 12px;
+  }
+}
+/* ✅ YANGI: Telegram link uchun stil */
+.contact-item.telegram-link {
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.contact-item.telegram-link:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.contact-icon {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+  color: #ffd700; /* Oltin rang ikonkalar uchun */
+}
+
+/* Hover effektlari */
+.contact-item:hover {
+  color: white;
+  transform: translateX(5px);
+  transition: all 0.3s ease;
+}
+
+.system-scope:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+/* ✅ YANGI: Katta ekranlar uchun struktura */
+.footer-main-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 40px;
+}
+
+.system-info {
+  flex: 1;
+}
+
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 200px;
+}
+
+.copyright {
+  text-align: center;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .footer-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 20px;
+    padding: 0 15px;
+  }
+  
+  .footer-main-info {
+    flex-direction: column;
+    gap: 25px;
+  }
+  
+  .contact-info {
+    align-items: center;
+    width: 100%;
+  }
+  
+  .system-info {
     text-align: center;
   }
   

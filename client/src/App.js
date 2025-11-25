@@ -25,40 +25,44 @@ function App() {
               </Routes>
             </main>
             
-            {/* ✅ Footer with contact information and details */}
+            {/* ✅ Footer with all information in one place */}
             <footer className="app-footer">
               <div className="footer-content">
-                <div className="footer-info">
-                  <p className="system-description">
-                    Данная система предназначена для бронирования стиральных машин в университетском общежитии.
-                  </p>
-                  <p className="system-scope">
-                    Сервис действует только для общежития №3.
-                  </p>
-                </div>
-                <div className="contact-info">
-                  <div className="contact-item">
-                    <span className="contact-icon">📞</span>
-                    <span>+7 967 981 86 70</span>
+                <div className="footer-main-info">
+                  <div className="system-info">
+                    <p className="system-description">
+                      Данная система предназначена для бронирования стиральных машин в университетском общежитии.
+                    </p>
+                    <p className="system-scope">
+                      Сервис действует только для общежития №3.
+                    </p>
                   </div>
-                  <a 
-                    href="https://t.me/rus1amm" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="contact-item telegram-link"
-                  >
-                     <img 
-                      src="https://telegram.org/img/t_logo.svg"
-                      alt="Telegram"
-                      className="contact-icon"
-                      style={{ width: '20px', height: '20px', marginRight: '6px' }}
-                    />
-                    <span>Telegram: @rus1amm</span>
-                  </a>
+                  
+                  <div className="contact-info">
+                    <div className="contact-item">
+                      <span className="contact-icon">📞</span>
+                      <span>+7 967 981 86 70</span>
+                    </div>
+                    <a 
+                      href="https://t.me/rus1amm" 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="contact-item telegram-link"
+                    >
+                      <img 
+                        src="https://telegram.org/img/t_logo.svg"
+                        alt="Telegram"
+                        className="contact-icon"
+                        style={{ width: '20px', height: '20px', marginRight: '6px' }}
+                      />
+                      <span>Telegram: @rus1amm</span>
+                    </a>
+                  </div>
                 </div>
+                
                 <p className="copyright">
-                    © 2025 Система бронирования стиральных машин. Все права защищены.
-                  </p>
+                  © 2025 Система бронирования стиральных машин. Все права защищены.
+                </p>
               </div>
             </footer>
           </div>
