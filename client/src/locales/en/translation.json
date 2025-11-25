@@ -25,7 +25,6 @@
 		"fullName": "Full Name",
 		"roomNumber": "Room Number",
 		"fullNamePlaceholder": "Example: John Doe",
-		"roomPlaceholder": "Example: 101",
 		"submit": "Register",
 		"loading": "Loading...",
 		"nameRequired": "Full name is required",
@@ -40,7 +39,13 @@
     	"userNotFound": "User does not exist or an error occurred",
     	"registerButton": "Register",
     	"viewBookingsButton": "View My Bookings",
-    	"checking": "Checking..."
+    	"checking": "Checking...",
+		"welcomeBack": "Welcome back, {{name}}! You can make new bookings for the new week",
+		"welcomeNew": "Welcome, {{name}}! Make your first booking",
+		"nameRoomCombinationExists": "This name and room number combination already exists",
+		"weeklyNote": "You can make new bookings every week. Even if you registered before, click 'Register' again for the new week.",
+		"namePlaceholder": "Your full name",
+		"roomPlaceholder": "Your room number"
 	},
 	"booking": {
 		"selectDate": "Select Date",
@@ -67,8 +72,43 @@
 		"cancel": "Cancel",
 		"cancelSuccess": "Booking successfully canceled",
 		"noBookings": "No bookings available",
-		"active": "Active"
+		"active": "Active",
+		"weeklyLimitReached": "You have already made a booking for this week. Please try again next week.",
+    	"weeklyLimitInfo": "Each user can book 1 time per week",
+		"summary": "Summary",
+		"machine": "Machine",
+		"notSelected": "Not selected",
+		"chooseDateFirst": "Select date first",
+		"noBookingsForTime": "No bookings for this time slot",
+		"timePassed": "Time passed"
 	},
+	 "days": {
+    "short": {
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat",
+      "sun": "Sun"
+    }
+  },
+  "months": {
+    "short": {
+      "jan": "Jan",
+      "feb": "Feb",
+      "mar": "Mar",
+      "apr": "Apr",
+      "may": "May",
+      "jun": "Jun",
+      "jul": "Jul",
+      "aug": "Aug",
+      "sep": "Sep",
+      "oct": "Oct",
+      "nov": "Nov",
+      "dec": "Dec"
+    }
+  },
 	"admin": {
 		"title": "Admin Panel",
 		"login": "Admin Login",
@@ -118,7 +158,21 @@
 		"admin": "Admin",
 		"registeredAt": "Registered At",
 		"noUsersFound": "No Users Found",
-		"noUsersMessage": "No registered users found"
+		"noUsersMessage": "No registered users found",
+		"bookingDeleted": "Booking deleted successfully",
+		"totalBookings": "Total bookings",
+		 "invalid_credentials": "Invalid login or password",
+		"account_locked": "Your account is locked",
+		"account_locked_after_attempts": "Your account has been locked",
+		"login_success": "Login successful"
+	},
+	"auth": {
+    "accountLocked": "You have tried too many times, please try again later!",
+	"accountLockedMessage": "Your account is locked.",
+    "accountLockedDuration": "Your account is locked.",
+    "invalidCredentials": "Invalid login or password",
+    "warningLastAttempt": "Warning! Next failed attempt will lock your account.",
+    "accountUnlocked": "Your account has been unlocked."
 	},
 	"common": {
 		"room": "Room",
@@ -248,5 +302,11 @@
     "verificationError": "User verification error:",
     "loadBookingsError": "Error loading bookings:",
 	"active": "Active"
+  },
+  "errors": {
+    "name_room_combination_exists": "This name and room number combination already exists",
+	"room_already_registered": "A machine has already been booked for this room number. Please check your room number or wait for next week.",
+	"weekly_limit": "You have already made a booking for this week. Please try again next week.",
+	"server_error": "Server error"
   }
 }

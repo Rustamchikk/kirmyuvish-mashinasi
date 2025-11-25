@@ -25,7 +25,6 @@
 		"fullName": "Ism va Familiya",
 		"roomNumber": "Xona Raqami",
 		"fullNamePlaceholder": "Masalan: Ali Valiyev",
-		"roomPlaceholder": "Masalan: 101",
 		"submit": "Ro'yxatdan O'tish",
 		"loading": "Yuklanmoqda...",
 		"nameRequired": "Iltimos, ism va familiyangizni kiriting",
@@ -41,7 +40,13 @@
     	"userNotFound": "Foydalanuvchi mavjud emas yoki xatolik yuz berdi",
     	"registerButton": "Ro'yxatdan o'tish",
     	"viewBookingsButton": "Mening bronlarimni ko'rish",
-    	"checking": "Tekshirilmoqda..."
+    	"checking": "Tekshirilmoqda...",
+		"welcomeBack": "Xush kelibsiz, {{name}}! Yangi haftada yangi bronlar qilishingiz mumkin",
+		"welcomeNew": "Xush kelibsiz, {{name}}! Birinchi broningizni qiling",
+		"nameRoomCombinationExists": "Bu ism va xona raqami kombinatsiyasi allaqachon mavjud",
+		"weeklyNote": "Har hafta yangi bronlar qilishingiz mumkin. Avval ro'yxatdan o'tgan bo'lsangiz ham, yangi haftada yana 'Ro'yxatdan o'tish' tugmasini bosing.",
+		"namePlaceholder": "To'liq ismingiz",
+		"roomPlaceholder": "Xona raqamingiz"
 	},
 	"booking": {
 		"selectDate": "Kunni Tanlang",
@@ -68,8 +73,49 @@
 		"cancel": "Bekor Qilish",
 		"cancelSuccess": "Bron muvaffaqiyatli bekor qilindi",
 		"noBookings": "Hozircha bronlar mavjud emas",
-		"active": "Faol"
+		"active": "Faol",
+		"weeklyLimitReached": "Siz bu hafta uchun bron qilishingiz mumkin. Iltimos, keyingi haftada urinib ko'ring.",
+		"weeklyLimitInfo": "Har bir foydalanuvchi haftada 1 marta bron qilishi mumkin",
+		"summary": "Xulosa",
+		"machine": "Mashina",
+		"notSelected": "Tanlanmagan",
+		"chooseDateFirst": "Avval sana tanlang",
+		"noBookingsForTime": "Bu vaqt oralig'ida bronlar mavjud emas",
+		"timePassed": "Vaqt o'tgan"
 	},
+	
+	"errors": {
+		"name_room_combination_exists": "Bu ism va xona raqami kombinatsiyasi allaqachon mavjud",
+		"room_already_registered": "Bu xona raqami orqali allaqachon mashina bron qilingan. Iltimos, xona raqamingizni to'g'ri yozing yoki keyingi haftani kuting.",
+		"weekly_limit": "Siz bu hafta uchun bron qilishingiz mumkin. Iltimos, keyingi haftada urinib ko'ring."
+	},
+	"days": {
+    "short": {
+      "mon": "Du",
+      "tue": "Se",
+      "wed": "Ch",
+      "thu": "Pa",
+      "fri": "Ju",
+      "sat": "Sh",
+      "sun": "Ya"
+    }
+  },
+  "months": {
+    "short": {
+      "jan": "Yan",
+      "feb": "Fev",
+      "mar": "Mar",
+      "apr": "Apr",
+      "may": "May",
+      "jun": "Iyn",
+      "jul": "Iyl",
+      "aug": "Avg",
+      "sep": "Sen",
+      "oct": "Okt",
+      "nov": "Noy",
+      "dec": "Dek"
+    }
+  },
 	"admin": {
 		"title": "Admin Panel",
 		"login": "Admin Kirish",
@@ -117,9 +163,15 @@
 		"deleteAllUsersError": "Foydalanuvchilarni o'chirishda xatolik",
 		"superAdmin": "Super Admin",
 		"admin": "Admin",
+		"bookingDeleted": "Band qilish muvaffaqiyatli o'chirildi",
 		"registeredAt": "Ro'yxatdan O'tgan",
 		"noUsersFound": "Foydalanuvchilar Topilmadi",
-		"noUsersMessage": "Hech qanday ro'yxatdan o'tgan foydalanuvchi topilmadi"
+		"noUsersMessage": "Hech qanday ro'yxatdan o'tgan foydalanuvchi topilmadi",
+		"totalBookings": "Jami bronlar",
+		"invalid_credentials": "Noto'g'ri login yoki parol",
+		"account_locked": "Hisobingiz bloklangan",
+		"account_locked_after_attempts": "Hisobingiz bloklandi",
+		"login_success": "Muvaffaqiyatli kirish"
 	},
 	"common": {
 		"room": "Xona",
@@ -191,6 +243,14 @@
   		"invalid_admin_credentials": "Login yoki parol noto‘g‘ri",
 		"invalid_credentials": "Login yoki parol noto‘g‘ri"
 	},
+	"auth": {
+    "accountLocked": "Siz juda kop urindingiz, iltimos bir ozdan song qayta urinib koring!",
+	"accountLockedMessage": "Hisobingiz bloklangan.",
+    "accountLockedDuration": "Hisobingizbloklandi",
+    "invalidCredentials": "Noto'g'ri login yoki parol",
+    "warningLastAttempt": "Diqqat! Keyingi noto'g'ri urinish hisobingizni bloklaydi.",
+    "accountUnlocked": "Qayta urinib ko'ring."
+  },
 	"success": {
 		"operationCompleted": "Amal muvaffaqiyatli bajarildi",
 		"dataSaved": "Ma'lumotlar saqlandi",

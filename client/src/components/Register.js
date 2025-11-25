@@ -22,7 +22,7 @@ const Register = ({ onRegister }) => {
   
     const key = rawKey.trim();
   
-    // 1) Key aynan mavjud bo‘lsa
+    // 1) Key aynan mavjud bo'lsa
     if (i18n.exists(key)) return key;
   
     // 2) errors.xxx → error.xxx
@@ -39,7 +39,7 @@ const Register = ({ onRegister }) => {
       if (i18n.exists(alt)) return alt;
     }
   
-    // 4) Ba’zan backend faqat room_not_exist yuboradi
+    // 4) Ba'zan backend faqat room_not_exist yuboradi
     const alt1 = `error.${key}`;
     if (i18n.exists(alt1)) return alt1;
   
@@ -102,10 +102,6 @@ const Register = ({ onRegister }) => {
         onRegister(user.room_number)
       }
     } catch (error) {
-      console.log("REGISTER ERROR RAW:", error)
-      console.log("REGISTER ERROR DATA:", error.response?.data)
-      console.log("REGISTER MESSAGE:", error.response?.data?.message)
-
       const rawKey = error.response?.data?.message
       const resolved = resolveServerKey(rawKey)
       const errorMessage = resolved ? t(resolved) : t('register.registrationError')
@@ -138,10 +134,6 @@ const Register = ({ onRegister }) => {
         showAlert('error', resolved ? t(resolved) : t('register.userNotRegistered'))
       }
     } catch (error) {
-      console.log("VERIFY ERROR RAW:", error)
-      console.log("VERIFY ERROR DATA:", error.response?.data)
-      console.log("VERIFY MESSAGE:", error.response?.data?.message)
-
       const rawKey = error.response?.data?.message
       const resolved = resolveServerKey(rawKey)
       const errorMessage = resolved ? t(resolved) : t('register.userNotFound')

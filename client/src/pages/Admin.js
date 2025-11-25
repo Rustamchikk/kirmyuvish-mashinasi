@@ -1,4 +1,4 @@
-// pages/Admin.js
+// pages/Admin.js - TO'LIQ YANGILANGAN VERSIYA (LOGIN LIMIT BILAN)
 import { format } from 'date-fns'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -13,7 +13,8 @@ import {
   userAPI, 
   adminAuthAPI, 
   adminMonitoringAPI,
-  adminUsersAPI 
+  adminUsersAPI,
+  adminUsersHistoryAPI
 } from '../services/api'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -31,6 +32,13 @@ const Admin = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [adminType, setAdminType] = useState('')
 
+  // ✅ YANGI: Login limit state lari
+  const [loginAttempts, setLoginAttempts] = useState(0)
+  const [isLocked, setIsLocked] = useState(false)
+  const [lockedUntil, setLockedUntil] = useState(null)
+  const [remainingTime, setRemainingTime] = useState(0)
+  const [remainingAttempts, setRemainingAttempts] = useState(4)
+
   // Foydalanuvchilarni qidirish uchun state
   const [userSearch, setUserSearch] = useState('')
 
@@ -39,6 +47,32 @@ const Admin = () => {
   const [sessionStats, setSessionStats] = useState(null)
   const [showSessionModal, setShowSessionModal] = useState(false)
   const [refreshTrigger, setRefreshTrigger] = useState(0)
+
+  // ✅ YANGI: usersadmin state lari
+  const [historyUsers, setHistoryUsers] = useState([])
+  const [historyLoading, setHistoryLoading] = useState(false)
+  const [showHistory, setShowHistory] = useState(false)
+  const [historySearch, setHistorySearch] = useState('')
+  const [historyStats, setHistoryStats] = useState(null)
+  
+  // ✅ YANGI: Foydalanuvchi bronlari state lari
+  const [userBookings, setUserBookings] = useState([])
+  const [selectedUser, setSelectedUser] = useState(null)
+  const [showUserBookings, setShowUserBookings] = useState(false)
+
+  // 🔧 ALERT FUNCTIONS
+  const showAlert = (type, message) => {
+    setAlert({ type, message })
+    
+    // 5 soniyadan so'ng avtomatik yopilish
+    setTimeout(() => {
+      setAlert({ type: '', message: '' })
+    }, 5000)
+  }
+
+  const handleCloseAlert = () => {
+    setAlert({ type: '', message: '' })
+  }
 
   // 🔧 SERVER ERROR KEY NORMALIZER
   const resolveServerKey = (key) => {
@@ -67,37 +101,114 @@ const Admin = () => {
     return null;
   };
 
-  // Backend orqali login
+  // ✅ YANGI: Countdown timer funksiyasi
+  const startCountdown = (minutes) => {
+    let timeLeft = minutes * 60; // sekundlarda
+    
+    const timer = setInterval(() => {
+      timeLeft -= 1;
+      setRemainingTime(Math.ceil(timeLeft / 60));
+      
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        setIsLocked(false);
+        setLoginAttempts(0);
+        setRemainingAttempts(4);
+        showAlert('success', t('auth.accountUnlocked'));
+      }
+    }, 1000);
+  };
+
+  // ✅ YANGILANGAN: Backend orqali login (LIMIT BILAN)
   const handleLogin = async e => {
     e.preventDefault()
+    
+    if (isLocked) {
+      showAlert('error', t('auth.accountLockedMessage', { remainingTime }));
+      return;
+    }
+
     setLoading(true)
     
     try {
       const response = await adminAuthAPI.login(auth.username, auth.password)
       
       if (response.data.success) {
-        // Token ni saqlash
+        // Muvaffaqiyatli login
         localStorage.setItem('adminToken', response.data.token)
         localStorage.setItem('adminType', response.data.adminType)
         
         adminLogin()
         setIsAuthenticated(true)
         setAdminType(response.data.adminType)
+        setLoginAttempts(0)
+        setRemainingAttempts(4)
+        setIsLocked(false)
+        
         showAlert('success', t('admin.loginSuccess'))
         
-        // Agar super admin bo'lsa, session ma'lumotlarini yuklash
         if (response.data.adminType === 'super') {
           loadSessionData()
         }
       }
     } catch (error) {
-      const rawKey = error.response?.data?.message;
-      const resolved = resolveServerKey(rawKey);
-      const message = resolved ? t(resolved) : t('admin.invalidCredentials');
-      showAlert('error', message)
+      console.log('🔴 Login xatosi:', error.response?.data);
+      
+      const responseData = error.response?.data;
+      
+      if (error.response?.status === 429) {
+        // Account locked
+        setIsLocked(true);
+        setLockedUntil(responseData.data?.lockedUntil);
+        
+        const lockMinutes = responseData.data?.lockedMinutes || 4;
+        
+        // ✅ TO'G'RI: lockMessage ni aniqlang va tarjima qilish
+        const lockMessage = responseData.data?.message || 
+          t('auth.accountLockedDuration', { lockMinutes });
+        
+        showAlert('error', lockMessage);
+        
+        // Countdown timer
+        startCountdown(lockMinutes);
+        
+      } else if (error.response?.status === 401) {
+        // Noto'g'ri login yoki parol
+        const attempts = responseData.data?.remainingAttempts !== undefined 
+          ? responseData.data.remainingAttempts 
+          : (4 - loginAttempts - 1);
+        
+        const newAttempts = loginAttempts + 1;
+        setLoginAttempts(newAttempts);
+        setRemainingAttempts(attempts);
+        
+        // ✅ TO'G'RI: Faqat "Noto'g'ri login yoki parol" xabari
+        const errorMessage = responseData.data?.message || t('auth.invalidCredentials');
+        
+        showAlert('error', errorMessage);
+        
+        // 3-chi urinishda ogohlantirish
+        if (newAttempts >= 3) {
+          showAlert('warning', t('auth.warningLastAttempt'));
+        }
+      } else {
+        // Boshqa xatoliklar
+        const rawKey = error.response?.data?.message;
+        const resolved = resolveServerKey(rawKey);
+        const message = resolved ? t(resolved) : t('admin.invalidCredentials');
+        showAlert('error', message);
+      }
     } finally {
       setLoading(false)
     }
+  }
+
+  // ✅ YANGI: Reset login attempts
+  const resetLoginAttempts = () => {
+    setLoginAttempts(0);
+    setRemainingAttempts(4);
+    setIsLocked(false);
+    setRemainingTime(0);
   }
 
   useEffect(() => {
@@ -147,130 +258,197 @@ const Admin = () => {
     }
   }
 
-  const showAlert = (type, message) => {
-    setAlert({ type, message })
-    setTimeout(() => setAlert({ type: '', message: '' }), 4000)
-  }
-
-  const handleDeleteBooking = async id => {
-    if (!window.confirm(t('admin.deleteConfirmation'))) return
+  // ✅ YANGI: usersadmin ma'lumotlarini yuklash (usersadmin jadvalidan)
+  const loadHistoryUsers = async () => {
+    setHistoryLoading(true)
     try {
-      await bookingAPI.delete(id)
-      showAlert('success', t('booking.cancelSuccess'))
-      loadData()
-    } catch (error) {
-      const rawKey = error.response?.data?.message;
-      const resolved = resolveServerKey(rawKey);
-      const message = resolved ? t(resolved) : t('error.cancelBooking');
-      showAlert('error', message)
-    }
-  }
-
-  const handleMachineToggle = async (id, isActive) => {
-    try {
-      await machineAPI.update(id, { is_active: !isActive })
-      showAlert('success', t('admin.machineStatusUpdated'))
-      loadData()
-    } catch (error) {
-      const rawKey = error.response?.data?.message;
-      const resolved = resolveServerKey(rawKey);
-      const message = resolved ? t(resolved) : t('error.updateMachine');
-      showAlert('error', message)
-    }
-  }
-
-  // Session boshqaruv funksiyalari - YANGILANDI
-  const handleEndSession = async (sessionId) => {
-    if (!window.confirm(t('admin.endSessionConfirmation'))) return
-    
-    try {
-      const response = await adminMonitoringAPI.endSession(sessionId)
+      // 1. Avval statistikani olish
+      const statsResponse = await adminUsersHistoryAPI.getStats()
+      setHistoryStats(statsResponse.data.data)
       
-      if (response.data.success) {
-        // State ni darhol yangilash
-        setSessions(prevSessions => prevSessions.filter(session => session.id !== sessionId))
-        
-        // Statistikani yangilash
-        if (sessionStats) {
-          setSessionStats(prevStats => ({
-            ...prevStats,
-            active_sessions: Math.max(0, prevStats.active_sessions - 1)
-          }))
-        }
-        
-        // Refresh trigger ni yangilash
-        setRefreshTrigger(prev => prev + 1)
-        
-        showAlert('success', response.data.message)
-      }
-    } catch (error) {
-      const rawKey = error.response?.data?.message;
-      const resolved = resolveServerKey(rawKey);
-      const message = resolved ? t(resolved) : t('admin.endSessionError');
-      showAlert('error', message)
-    }
-  }
-
-  const handleEndAllSessions = async () => {
-    if (!window.confirm(t('admin.endAllSessionsConfirmation'))) return
-    
-    try {
-      const response = await adminMonitoringAPI.endAllSessions()
+      // 2. Keyin barcha foydalanuvchilarni olish
+      const response = await adminUsersHistoryAPI.getAllUsers()
+      setHistoryUsers(response.data.data)
       
-      if (response.data.success) {
-        // Local state larni yangilash
-        setSessions([])
-        if (sessionStats) {
-          setSessionStats(prevStats => ({
-            ...prevStats,
-            active_sessions: 0
-          }))
-        }
-        
-        // Refresh trigger ni yangilash
-        setRefreshTrigger(prev => prev + 1)
-        
-        showAlert('success', response.data.message)
-      }
     } catch (error) {
+      console.error('❌ History users load error:', error)
+      console.error('Error details:', error.response?.data)
       const rawKey = error.response?.data?.message;
       const resolved = resolveServerKey(rawKey);
-      const message = resolved ? t(resolved) : t('admin.endAllSessionsError');
+      const message = resolved ? t(resolved) : t('error.serverError');
       showAlert('error', message)
+    } finally {
+      setHistoryLoading(false)
     }
   }
 
-  // Foydalanuvchini o'chirish
-  const handleDeleteUser = async (userId, userName) => {
-    if (!window.confirm(t('admin.deleteUserConfirmation', { name: userName }))) return
-    
+  // ✅ YANGI: usersadmin qidirish (usersadmin jadvalidan)
+  const handleHistorySearch = async () => {
+    if (!historySearch.trim()) {
+      loadHistoryUsers() // Bo'sh qidiruvda barchasini ko'rsatish
+      return
+    }
+
+    setHistoryLoading(true)
     try {
-      await adminUsersAPI.deleteUser(userId)
-      showAlert('success', t('admin.userDeleted'))
-      loadData()
+      const response = await adminUsersHistoryAPI.searchUsers(historySearch)
+      setHistoryUsers(response.data.data)
     } catch (error) {
+      console.error('❌ History search error:', error)
       const rawKey = error.response?.data?.message;
       const resolved = resolveServerKey(rawKey);
-      const message = resolved ? t(resolved) : t('admin.deleteUserError');
+      const message = resolved ? t(resolved) : t('error.serverError');
       showAlert('error', message)
+    } finally {
+      setHistoryLoading(false)
     }
   }
 
-  // Barcha foydalanuvchilarni o'chirish
+  // ✅ YANGI: Foydalanuvchining bron tarixini yuklash
+  const loadUserBookings = async (userId, userName) => {
+    setHistoryLoading(true)
+    try {
+      const response = await adminUsersHistoryAPI.getUserBookings(userId)
+      setUserBookings(response.data.data)
+      setSelectedUser({ id: userId, name: userName })
+      setShowUserBookings(true)
+    } catch (error) {
+      console.error('❌ Load user bookings error:', error)
+      const rawKey = error.response?.data?.message
+      const resolved = resolveServerKey(rawKey)
+      const message = resolved ? t(resolved) : t('error.serverError')
+      showAlert('error', message)
+    } finally {
+      setHistoryLoading(false)
+    }
+  }
+
+  // ✅ YANGI: handleDeleteAllUsers funksiyasi
   const handleDeleteAllUsers = async () => {
-    if (!window.confirm(t('admin.deleteAllUsersConfirmation'))) return
-    
+    if (!window.confirm(t('admin.confirmDeleteAllUsers'))) {
+      return;
+    }
+
+    setLoading(true);
     try {
-      await adminUsersAPI.deleteAllUsers()
-      showAlert('success', t('admin.allUsersDeleted'))
-      loadData()
+      const response = await adminUsersAPI.deleteAllUsers();
+      if (response.data.success) {
+        showAlert('success', t('admin.allUsersDeleted'));
+        // Foydalanuvchilar ro'yxatini yangilash
+        const usersRes = await userAPI.getAll();
+        setUsers(usersRes.data.data);
+      }
     } catch (error) {
       const rawKey = error.response?.data?.message;
       const resolved = resolveServerKey(rawKey);
-      const message = resolved ? t(resolved) : t('admin.deleteAllUsersError');
-      showAlert('error', message)
+      const message = resolved ? t(resolved) : t('error.serverError');
+      showAlert('error', message);
+    } finally {
+      setLoading(false);
     }
-  }
+  };
+
+  // ✅ YANGI: handleDeleteUser funksiyasi
+  const handleDeleteUser = async (userId, userName) => {
+    if (!window.confirm(`${t('admin.confirmDeleteUser')} ${userName}?`)) {
+      return;
+    }
+
+    try {
+      const response = await adminUsersAPI.deleteUser(userId);
+      if (response.data.success) {
+        showAlert('success', t('admin.userDeleted'));
+        // Foydalanuvchilar ro'yxatini yangilash
+        const usersRes = await userAPI.getAll();
+        setUsers(usersRes.data.data);
+      }
+    } catch (error) {
+      const rawKey = error.response?.data?.message;
+      const resolved = resolveServerKey(rawKey);
+      const message = resolved ? t(resolved) : t('error.serverError');
+      showAlert('error', message);
+    }
+  };
+
+  // ✅ YANGI: handleDeleteBooking funksiyasi
+  const handleDeleteBooking = async (bookingId) => {
+    if (!window.confirm(t('admin.confirmDeleteBooking'))) {
+      return;
+    }
+
+    try {
+      const response = await bookingAPI.delete(bookingId);
+      if (response.data.success) {
+        showAlert('success', t('admin.bookingDeleted'));
+        // Band qilishlar ro'yxatini yangilash
+        const bookingsRes = await bookingAPI.getAll(format(selectedDate, 'yyyy-MM-dd'));
+        setBookings(bookingsRes.data.data);
+      }
+    } catch (error) {
+      const rawKey = error.response?.data?.message;
+      const resolved = resolveServerKey(rawKey);
+      const message = resolved ? t(resolved) : t('error.serverError');
+      showAlert('error', message);
+    }
+  };
+
+  // ✅ YANGI: handleMachineToggle funksiyasi
+  const handleMachineToggle = async (machineId, isActive) => {
+    try {
+      const response = await machineAPI.update(machineId, { is_active: !isActive });
+      if (response.data.success) {
+        showAlert('success', t('admin.machineStatusUpdated'));
+        // Mashinalar ro'yxatini yangilash
+        const machinesRes = await machineAPI.getAll();
+        setMachines(machinesRes.data.data);
+      }
+    } catch (error) {
+      const rawKey = error.response?.data?.message;
+      const resolved = resolveServerKey(rawKey);
+      const message = resolved ? t(resolved) : t('error.serverError');
+      showAlert('error', message);
+    }
+  };
+
+  // ✅ YANGI: handleEndSession funksiyasi
+  const handleEndSession = async (sessionId) => {
+    try {
+      const response = await adminMonitoringAPI.endSession(sessionId);
+      if (response.data.success) {
+        showAlert('success', t('admin.sessionEnded'));
+        // Session ma'lumotlarini yangilash
+        loadSessionData();
+        setRefreshTrigger(prev => prev + 1);
+      }
+    } catch (error) {
+      const rawKey = error.response?.data?.message;
+      const resolved = resolveServerKey(rawKey);
+      const message = resolved ? t(resolved) : t('error.serverError');
+      showAlert('error', message);
+    }
+  };
+
+  // ✅ YANGI: handleEndAllSessions funksiyasi
+  const handleEndAllSessions = async () => {
+    if (!window.confirm(t('admin.confirmEndAllSessions'))) {
+      return;
+    }
+
+    try {
+      const response = await adminMonitoringAPI.endAllSessions();
+      if (response.data.success) {
+        showAlert('success', t('admin.allSessionsEnded'));
+        // Session ma'lumotlarini yangilash
+        loadSessionData();
+        setRefreshTrigger(prev => prev + 1);
+      }
+    } catch (error) {
+      const rawKey = error.response?.data?.message;
+      const resolved = resolveServerKey(rawKey);
+      const message = resolved ? t(resolved) : t('error.serverError');
+      showAlert('error', message);
+    }
+  };
 
   // Foydalanuvchilarni filtrlash
   const filteredUsers = userSearch 
@@ -280,13 +458,35 @@ const Admin = () => {
       )
     : users
 
+  // ✅ YANGI: Filtrlangan history foydalanuvchilar
+  const filteredHistoryUsers = historySearch 
+    ? historyUsers.filter(user =>
+        user.full_name?.toLowerCase().includes(historySearch.toLowerCase()) ||
+        user.room_number?.toLowerCase().includes(historySearch.toLowerCase())
+      )
+    : historyUsers
+
   // Login page
   if (!isAuthenticated) {
     return (
       <div className='admin-login'>
         <form onSubmit={handleLogin} className='admin-login-form'>
           <h2>{t('admin.login')}</h2>
+          
+          {/* ✅ YANGI: Login limit ogohlantirishlari */}
+          {isLocked && (
+            <div className="lock-warning">
+              <p>{t('auth.accountLocked')}</p>
+            </div>
+          )}
+
+          {loginAttempts > 0 && !isLocked && (
+            <div className="attempts-warning">
+            </div>
+          )}
+
           <Alert type={alert.type} message={alert.message} />
+          
           <div className='form-group'>
             <label>{t('admin.username')}</label>
             <input
@@ -294,6 +494,7 @@ const Admin = () => {
               value={auth.username}
               onChange={e => setAuth({ ...auth, username: e.target.value })}
               required
+              disabled={isLocked}
             />
           </div>
           <div className='form-group'>
@@ -303,11 +504,28 @@ const Admin = () => {
               value={auth.password}
               onChange={e => setAuth({ ...auth, password: e.target.value })}
               required
+              disabled={isLocked}
             />
           </div>
-          <button type='submit' className='btn-primary' disabled={loading}>
-            {loading ? t('common.loading') : t('admin.login')}
-          </button>
+          
+          <div className="login-actions">
+            <button 
+              type='submit' 
+              className='btn-primary' 
+              disabled={loading || isLocked}
+            >
+              {loading ? t('common.loading') : t('admin.login')}
+            </button>
+            
+            {loginAttempts > 0 && (
+              <button 
+                type="button" 
+                className="btn-secondary btn-sm"
+                onClick={resetLoginAttempts}
+              >
+              </button>
+            )}
+          </div>
         </form>
       </div>
     )
@@ -326,7 +544,12 @@ const Admin = () => {
         </div>
       </header>
 
-      <Alert type={alert.type} message={alert.message} />
+      {/* 🔥 YANGILANGAN ALERT - FIXED POSITION */}
+      <Alert 
+        type={alert.type} 
+        message={alert.message} 
+        onClose={handleCloseAlert}
+      />
 
       {/* Session Monitoring Section - FAQAT SUPER ADMIN UCHUN */}
       {adminType === 'super' && (
@@ -334,18 +557,6 @@ const Admin = () => {
           <div className='section-header'>
             <h2>{t('admin.sessionMonitoring')}</h2>
             <div className='session-stats'>
-              {sessionStats && (
-                <div className='stats-badge'>
-                  <span className='stat-number'>{sessionStats.active_sessions}</span>
-                  <span className='stat-label'>{t('admin.activeSessions')}</span>
-                </div>
-              )}
-              {sessionStats && (
-                <div className='stats-badge'>
-                  <span className='stat-number'>{sessionStats.unique_devices}</span>
-                  <span className='stat-label'>{t('admin.devices')}</span>
-                </div>
-              )}
               <button 
                 onClick={() => setShowSessionModal(true)}
                 className='btn-info'
@@ -371,16 +582,6 @@ const Admin = () => {
           <span>{machines.length}</span>
           <p>{t('admin.totalMachines')}</p>
         </div>
-      </section>
-
-      {/* Sana tanlash - Ikkala admin uchun ham */}
-      <section className='date-section'>
-        <label>{t('admin.selectDate')}</label>
-        <input
-          type='date'
-          value={format(selectedDate, 'yyyy-MM-dd')}
-          onChange={e => setSelectedDate(new Date(e.target.value))}
-        />
       </section>
 
       {/* Mashinalarni boshqarish - Ikkala admin uchun ham */}
@@ -434,30 +635,55 @@ const Admin = () => {
         </div>
       </section>
 
+      {/* Sana tanlash - Ikkala admin uchun ham */}
+      <section className='date-section'>
+        <div className='section-header'>
+          <h2>{t('admin.selectDate')}</h2>
+        </div>
+        <div className='date-input-container'>
+          <input
+            type='date'
+            value={format(selectedDate, 'yyyy-MM-dd')}
+            onChange={e => setSelectedDate(new Date(e.target.value))}
+            className='date-picker'
+          />
+        </div>
+      </section>
+
       {/* Band qilishlar - Ikkala admin uchun ham */}
-      <section className='bookings-section'>
-        <h2>
-          {t('admin.bookings')} ({format(selectedDate, 'dd.MM.yyyy')})
-        </h2>
-        <div className='table-container'>
-          {bookings.length ? (
-            <table>
-              <thead>
-                <tr>
-                  <th>{t('register.fullName')}</th>
-                  <th>{t('common.room')}</th>
-                  <th>{t('admin.machines')}</th>
-                  <th>{t('booking.time')}</th>
-                  <th>{t('common.actions')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {bookings.map(b => (
+<section className='bookings-section'>
+  <h2>
+    {t('admin.bookings')} ({format(selectedDate, 'dd.MM.yyyy')})
+  </h2>
+  
+  {/* Vaqt oralig'iga qarab guruhlash */}
+  <div className='bookings-group-container'>
+    {/* 19:00-20:00 guruh */}
+    <div className='time-group'>
+      <h3 className='time-group-title'>🕖 19:00 - 20:00</h3>
+      <div className='table-container'>
+        {bookings.filter(b => b.time_slot === '19:00-20:00').length > 0 ? (
+          <table>
+            <thead>
+              <tr>
+                <th>{t('register.fullName')}</th>
+                <th>{t('common.room')}</th>
+                <th>{t('admin.machines')}</th>
+                <th>{t('booking.time')}</th>
+                <th>{t('common.actions')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {bookings
+                .filter(b => b.time_slot === '19:00-20:00')
+                .map(b => (
                   <tr key={b.id}>
                     <td>{b.full_name}</td>
                     <td>{b.room_number}</td>
                     <td>{b.machine_name}</td>
-                    <td>{b.time_slot}</td>
+                    <td>
+                      <span className='time-badge evening'>{b.time_slot}</span>
+                    </td>
                     <td>
                       <button
                         onClick={() => handleDeleteBooking(b.id)}
@@ -467,14 +693,113 @@ const Admin = () => {
                       </button>
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <p className='no-data'>{t('booking.noBookings')}</p>
-          )}
-        </div>
-      </section>
+                ))
+              }
+            </tbody>
+          </table>
+        ) : (
+          <div className='no-bookings-group'>
+            <p className='no-data-text'>🕖 {t('booking.noBookingsForTime')}</p>
+          </div>
+        )}
+      </div>
+    </div>
+
+    {/* 20:00-21:00 guruh */}
+    <div className='time-group'>
+      <h3 className='time-group-title'>🕗 20:00 - 21:00</h3>
+      <div className='table-container'>
+        {bookings.filter(b => b.time_slot === '20:00-21:00').length > 0 ? (
+          <table>
+            <thead>
+              <tr>
+                <th>{t('register.fullName')}</th>
+                <th>{t('common.room')}</th>
+                <th>{t('admin.machines')}</th>
+                <th>{t('booking.time')}</th>
+                <th>{t('common.actions')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {bookings
+                .filter(b => b.time_slot === '20:00-21:00')
+                .map(b => (
+                  <tr key={b.id}>
+                    <td>{b.full_name}</td>
+                    <td>{b.room_number}</td>
+                    <td>{b.machine_name}</td>
+                    <td>
+                      <span className='time-badge night'>{b.time_slot}</span>
+                    </td>
+                    <td>
+                      <button
+                        onClick={() => handleDeleteBooking(b.id)}
+                        className='btn-danger btn-sm'
+                      >
+                        {t('common.delete')}
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        ) : (
+          <div className='no-bookings-group'>
+            <p className='no-data-text'>🕗 {t('booking.noBookingsForTime')}</p>
+          </div>
+        )}
+      </div>
+    </div>
+
+    {/* 21:00-22:00 guruh */}
+    <div className='time-group'>
+      <h3 className='time-group-title'>🕘 21:00 - 22:00</h3>
+      <div className='table-container'>
+        {bookings.filter(b => b.time_slot === '21:00-22:00').length > 0 ? (
+          <table>
+            <thead>
+              <tr>
+                <th>{t('register.fullName')}</th>
+                <th>{t('common.room')}</th>
+                <th>{t('admin.machines')}</th>
+                <th>{t('booking.time')}</th>
+                <th>{t('common.actions')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {bookings
+                .filter(b => b.time_slot === '21:00-22:00')
+                .map(b => (
+                  <tr key={b.id}>
+                    <td>{b.full_name}</td>
+                    <td>{b.room_number}</td>
+                    <td>{b.machine_name}</td>
+                    <td>
+                      <span className='time-badge late-night'>{b.time_slot}</span>
+                    </td>
+                    <td>
+                      <button
+                        onClick={() => handleDeleteBooking(b.id)}
+                        className='btn-danger btn-sm'
+                      >
+                        {t('common.delete')}
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        ) : (
+          <div className='no-bookings-group'>
+            <p className='no-data-text'>🕘 {t('booking.noBookingsForTime')}</p>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+</section>
 
       {/* Foydalanuvchilar - FAQAT SUPER ADMIN UCHUN */}
       {adminType === 'super' && (
@@ -491,13 +816,6 @@ const Admin = () => {
                   className='search-input'
                 />
               </div>
-              <button 
-                onClick={handleDeleteAllUsers}
-                className='btn-danger'
-                disabled={users.length === 0}
-              >
-                🗑️ {t('admin.deleteAllUsers')}
-              </button>
             </div>
           </div>
           <div className='table-container'>
@@ -525,7 +843,7 @@ const Admin = () => {
                           className='btn-danger btn-sm'
                           title={t('admin.deleteUser')}
                         >
-                          🗑️ {t('common.delete')}
+                           {t('common.delete')}
                         </button>
                       </td>
                     </tr>
@@ -543,6 +861,129 @@ const Admin = () => {
         </section>
       )}
 
+      {/* ✅ YANGILANGAN: Usersadmin Panel - ENG PASTDA FAQAT SUPER ADMIN UCHUN */}
+      {adminType === 'super' && (
+        <section className='history-section'>
+          <div className='section-header'>
+            <h2>📈 Barcha Ro'yxatdan O'tgan Foydalanuvchilar (Arxiv)</h2>
+            <div className='section-actions'>
+              <div className='search-box'>
+                <input
+                  type='text'
+                  placeholder='Ism yoki xona raqami boʻyicha qidirish...'
+                  value={historySearch}
+                  onChange={(e) => setHistorySearch(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleHistorySearch()}
+                  className='search-input'
+                />
+                <button 
+                onClick={() => {
+                  setShowHistory(!showHistory)
+                  if (!showHistory) {
+                    loadHistoryUsers()
+                  }
+                }}
+                className={showHistory ? 'btn-secondary' : 'btn-primary'}
+              >
+                {showHistory ? 'Yopish' : '📋 Arxivi Koʻrish'}
+              </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Ko'rsatish/Yashirish */}
+          {showHistory && (
+            <>
+              {/* Statistika */}
+              {historyStats && (
+                <div className='stats-section'>
+                  <div className='stat-card'>
+                    <span className='stat-number'>{historyStats.totalUsers}</span>
+                    <p className='stat-label'>Jami Roʻyxatdan Oʻtganlar</p>
+                    <small style={{opacity: 0.7, fontSize: '0.75rem'}}>usersadmin bazasida</small>
+                  </div>
+                  <div className='stat-card'>
+                    <span className='stat-number'>{historyStats.usersWithBookings || 0}</span>
+                    <p className='stat-label'>Bron Qilganlar</p>
+                    <small style={{opacity: 0.7, fontSize: '0.75rem'}}>faol foydalanuvchilar</small>
+                  </div>
+                  <div className='stat-card'>
+                    <span className='stat-number'>{historyStats.totalBookings || 0}</span>
+                    <p className='stat-label'>Jami Bronlar</p>
+                    <small style={{opacity: 0.7, fontSize: '0.75rem'}}>barcha vaqtlar uchun</small>
+                  </div>
+                </div>
+              )}
+
+              {/* Jadval */}
+              <div className='table-container'>
+                {historyLoading ? (
+                  <Loading />
+                ) : filteredHistoryUsers.length > 0 ? (
+                  <table className='users-table'>
+                    <thead>
+                      <tr>
+                        <th>Ism</th>
+                        <th>Xona</th>
+                        <th>Status</th>
+                        <th>Mashina</th>
+                        <th>Bron Sanasi</th>
+                        <th>Vaqt Oralig'i</th>
+                        <th>Ro'yxatdan O'tgan Sana</th>
+                        <th>Harakatlar</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredHistoryUsers.map(record => (
+                        <tr key={record.id}>
+                          <td className='user-name'>{record.full_name}</td>
+                          <td className='room-number'>{record.room_number}</td>
+                          <td className='user-status'>
+                            <span className={`status-badge ${
+                              record.status === 'BRON_QILGAN' ? 'status-active' : 'status-inactive'
+                            }`}>
+                              {record.status === 'BRON_QILGAN' ? '✅ Bron qilgan' : '📝 Faqat roʻyxatdan oʻtgan'}
+                            </span>
+                          </td>
+                          <td className='machine-name'>
+                            {record.machine_name || '—'}
+                          </td>
+                          <td className='booking-date'>
+                            {record.booking_date ? format(new Date(record.booking_date), 'dd.MM.yyyy') : '—'}
+                          </td>
+                          <td className='time-slot'>
+                            {record.time_slot || '—'}
+                          </td>
+                          <td className='registration-date'>
+                            {record.registered_at ? format(new Date(record.registered_at), 'dd.MM.yyyy HH:mm') : 'Noma\'lum'}
+                          </td>
+                          <td className='user-actions'>
+                            {record.user_id && record.status === 'BRON_QILGAN' && (
+                              <button
+                                onClick={() => loadUserBookings(record.user_id, record.full_name)}
+                                className='btn-info btn-sm'
+                                title="Barcha bronlarni ko'rish"
+                              >
+                                📊 Bronlar
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <div className='no-data'>
+                    <p>Hech qanday ma'lumot topilmadi</p>
+                    <small>usersadmin bazasida ma'lumot yo'q</small>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </section>
+      )}
+
       {/* Session Modal */}
       {showSessionModal && (
         <SessionModal
@@ -552,6 +993,65 @@ const Admin = () => {
           onEndAllSessions={handleEndAllSessions}
           refreshTrigger={refreshTrigger}
         />
+      )}
+
+      {/* ✅ YANGI: Foydalanuvchi bronlari modali */}
+      {showUserBookings && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h3>📊 {selectedUser?.name} - Barcha Bron Tarixi</h3>
+              <button 
+                onClick={() => setShowUserBookings(false)}
+                className="close-btn"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="modal-body">
+              {historyLoading ? (
+                <Loading />
+              ) : userBookings.length > 0 ? (
+                <div className="modal-table-container">
+                  <table className="bookings-table">
+                    <thead>
+                      <tr>
+                        <th>Mashina</th>
+                        <th>Bron Sanasi</th>
+                        <th>Vaqt Oralig'i</th>
+                        <th>Bron Qilingan Vaqt</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {userBookings.map(booking => (
+                        <tr key={booking.id}>
+                          <td>{booking.machine_name}</td>
+                          <td>{format(new Date(booking.booking_date), 'dd.MM.yyyy')}</td>
+                          <td>{booking.time_slot}</td>
+                          <td>{format(new Date(booking.booking_created_at), 'dd.MM.yyyy HH:mm')}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="no-data">
+                  <p>Bu foydalanuvchining bronlari topilmadi</p>
+                </div>
+              )}
+            </div>
+            
+            <div className="modal-footer">
+              <button 
+                onClick={() => setShowUserBookings(false)}
+                className="btn-secondary"
+              >
+                Yopish
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
