@@ -1,32 +1,14 @@
+// routes/adminAuth.js - DOTENV BILAN YANGILANGAN VERSIYA
 const express = require('express');
 const router = express.Router();
 const AdminSession = require('../models/AdminSession');
+const db = require('../config/database');
+require('dotenv').config(); // ✅ DOTENV IMPORT
 
-// Helper functions
-function getBrowser(userAgent) {
-  if (userAgent.includes('Chrome')) return 'Chrome';
-  if (userAgent.includes('Firefox')) return 'Firefox';
-  if (userAgent.includes('Safari')) return 'Safari';
-  if (userAgent.includes('Edge')) return 'Edge';
-  return 'Unknown';
-}
+const MAX_ATTEMPTS = 4;
+const LOCK_TIME_MS = 4 * 60 * 1000;
 
-function getOS(userAgent) {
-  if (userAgent.includes('Windows')) return 'Windows';
-  if (userAgent.includes('Mac')) return 'MacOS';
-  if (userAgent.includes('Linux')) return 'Linux';
-  if (userAgent.includes('Android')) return 'Android';
-  if (userAgent.includes('iOS')) return 'iOS';
-  return 'Unknown';
-}
-
-function getDevice(userAgent) {
-  if (userAgent.includes('Mobile')) return 'Mobile';
-  if (userAgent.includes('Tablet')) return 'Tablet';
-  return 'Desktop';
-}
-
-// Admin credentials
+// ✅ DOTENV DAN ADMIN CREDENTIALS OLISH
 const adminCredentials = {
   [process.env.SUPER_ADMIN_USERNAME]: {
     password: process.env.SUPER_ADMIN_PASSWORD,
@@ -37,55 +19,251 @@ const adminCredentials = {
     type: 'regular'
   }
 };
+// Login attempts ni database dan olish
+const getLoginAttempts = async (username, ipAddress) => {
+  try {
+    const result = await db.query(
+      `SELECT * FROM admin_login_attempts 
+       WHERE username = $1 AND ip_address = $2`,
+      [username, ipAddress]
+    );
+    
+    return result.rows[0] || null;
+  } catch (error) {
+    return null;
+  }
+};
+
+// Login attempts ni yangilash
+const updateLoginAttempts = async (username, ipAddress, attemptData) => {
+  try {
+    const { attemptCount, isLocked, lockedUntil } = attemptData;
+    
+    const existing = await getLoginAttempts(username, ipAddress);
+    
+    if (existing) {
+      // Update existing record
+      await db.query(
+        `UPDATE admin_login_attempts 
+         SET attempt_count = $1, is_locked = $2, locked_until = $3, 
+             last_attempt = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+         WHERE username = $4 AND ip_address = $5`,
+        [attemptCount, isLocked, lockedUntil, username, ipAddress]
+      );
+    } else {
+      // Insert new record
+      await db.query(
+        `INSERT INTO admin_login_attempts 
+         (username, ip_address, attempt_count, is_locked, locked_until) 
+         VALUES ($1, $2, $3, $4, $5)`,
+        [username, ipAddress, attemptCount, isLocked, lockedUntil]
+      );
+    }
+    
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+// Login attempts ni o'chirish (muvaffaqiyatli login)
+const clearLoginAttempts = async (username, ipAddress) => {
+  try {
+    await db.query(
+      'DELETE FROM admin_login_attempts WHERE username = $1 AND ip_address = $2',
+      [username, ipAddress]
+    );
+    return true;
+  } catch (error) {
+    console.error('❌ Clear login attempts error:', error);
+    return false;
+  }
+};
+
+// Login limit middleware
+const checkLoginLimit = async (req, res, next) => {
+  try {
+    const { username } = req.body;
+    const clientIP = req.ip || req.connection.remoteAddress;
+    
+    const attempt = await getLoginAttempts(username, clientIP);
+
+    if (attempt && attempt.is_locked && attempt.locked_until) {
+      const lockedUntil = new Date(attempt.locked_until);
+      
+      if (lockedUntil > new Date()) {
+        const remainingTime = Math.ceil((lockedUntil - new Date()) / 1000 / 60);
+        return res.status(429).json({
+          success: false,
+          message: 'admin.account_locked',
+          data: {
+            remainingMinutes: remainingTime,
+            lockedUntil: lockedUntil.toISOString()
+          }
+        });
+      } else {
+        // Blokirovka vaqti tugagan, reset qilamiz
+        await updateLoginAttempts(username, clientIP, {
+          attemptCount: 0,
+          isLocked: false,
+          lockedUntil: null
+        });
+      }
+    }
+
+    next();
+  } catch (error) {
+    console.error('❌ Login limit check error:', error);
+    next();
+  }
+};
 
 // Admin login
-router.post('/login', async (req, res) => {
+router.post('/login', checkLoginLimit, async (req, res) => {
   try {
     const { username, password } = req.body;
     const clientIP = req.ip || req.connection.remoteAddress;
-    const userAgent = req.get('User-Agent');
-
-    const deviceInfo = {
-      userAgent: userAgent,
-      browser: getBrowser(userAgent),
-      os: getOS(userAgent),
-      device: getDevice(userAgent)
-    };
-
     // Admin mavjudligini tekshirish
     const admin = adminCredentials[username];
     if (!admin) {
       return res.status(401).json({
         success: false,
-        message: 'errors.invalid_credentials'
+        message: 'auth.invalidCredentials',
+        data: { remainingAttempts: null }
       });
     }
 
+    // Login attempts ni olish
+    const currentAttempt = await getLoginAttempts(username, clientIP);
+    const currentCount = currentAttempt ? currentAttempt.attempt_count : 0;
     // Parol xato
     if (admin.password !== password) {
-      return res.status(401).json({
-        success: false,
-        message: 'errors.invalid_credentials'
-      });
+      const newCount = currentCount + 1;
+      if (newCount >= MAX_ATTEMPTS) {
+        // 4-ta urinishdan keyin blokirovka
+        const lockedUntil = new Date(Date.now() + LOCK_TIME_MS);
+        
+        await updateLoginAttempts(username, clientIP, {
+          attemptCount: newCount,
+          isLocked: true,
+          lockedUntil: lockedUntil
+        });
+        return res.status(429).json({
+          success: false,
+          message: 'admin.account_locked_after_attempts',
+          data: {
+            remainingAttempts: 0,
+            lockedMinutes: LOCK_TIME_MS / 60000,
+            lockedUntil: lockedUntil.toISOString(),
+            messageData: { lockMinutes: LOCK_TIME_MS / 60000 }
+          }
+        });
+      } else {
+        // Urinishlar sonini yangilash
+        await updateLoginAttempts(username, clientIP, {
+          attemptCount: newCount,
+          isLocked: false,
+          lockedUntil: null
+        });
+
+        const remainingAttempts = MAX_ATTEMPTS - newCount;
+        return res.status(401).json({
+          success: false,
+          message: 'auth.invalidCredentials',
+          data: {
+            remainingAttempts: remainingAttempts,
+            message: 'auth.invalidCredentials'
+          }
+        });
+      }
     }
 
+    // ✅ TO'G'RI PAROL - Reset va session yaratish
+    await clearLoginAttempts(username, clientIP);
     // Session yaratish
     const session = await AdminSession.createSession(
       username,
-      deviceInfo,
+      { browser: 'Unknown', os: 'Unknown', device: 'Unknown' },
       clientIP
     );
-
     res.json({
       success: true,
-      message: 'success.admin_login',
+      message: 'admin.login_success',
       adminType: admin.type,
       username: username,
-      sessionId: session.id
+      sessionId: session.id,
+      token: 'admin-token-' + Date.now()
     });
 
   } catch (error) {
-    console.error('Admin login error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'errors.server_error'
+    });
+  }
+});
+
+// Debug endpoint - login attempts holatini ko'rish
+router.get('/debug/attempts', async (req, res) => {
+  try {
+    const result = await db.query(
+      'SELECT * FROM admin_login_attempts ORDER BY updated_at DESC'
+    );
+    
+    const attempts = {};
+    result.rows.forEach(row => {
+      const key = `${row.username}_${row.ip_address}`;
+      attempts[key] = {
+        count: row.attempt_count,
+        lockedUntil: row.locked_until ? new Date(row.locked_until).toLocaleString() : null,
+        isLocked: row.is_locked,
+        lastAttempt: new Date(row.last_attempt).toLocaleString(),
+        remainingMinutes: row.locked_until && row.is_locked 
+          ? Math.ceil((new Date(row.locked_until) - new Date()) / 60000)
+          : 0
+      };
+    });
+
+    res.json({
+      success: true,
+      data: {
+        totalAttempts: result.rows.length,
+        attempts: attempts
+      }
+    });
+  } catch (error) {
+    console.error('❌ Debug attempts error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'errors.server_error'
+    });
+  }
+});
+
+// Reset attempts (debug uchun)
+router.post('/debug/reset-attempts', async (req, res) => {
+  try {
+    const { username } = req.body;
+    let result;
+
+    if (username) {
+      result = await db.query(
+        'DELETE FROM admin_login_attempts WHERE username = $1',
+        [username]
+      );
+    } else {
+      result = await db.query('DELETE FROM admin_login_attempts');
+    }
+
+    res.json({
+      success: true,
+      message: 'admin.attempts_reset',
+      data: {
+        deletedCount: result.rowCount
+      }
+    });
+  } catch (error) {
+    console.error('❌ Reset attempts error:', error);
     res.status(500).json({
       success: false,
       message: 'errors.server_error'

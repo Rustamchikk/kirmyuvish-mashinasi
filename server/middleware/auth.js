@@ -1,24 +1,32 @@
-// Soddalik uchun JWT o'rniga basic auth middleware
+const jwt = require("jsonwebtoken");
+
 exports.requireAdmin = (req, res, next) => {
-	const authHeader = req.headers.authorization
+  try {
+    const header = req.headers.authorization;
 
-	if (!authHeader || !authHeader.startsWith('Basic ')) {
-		return res.status(401).json({
-			success: false,
-			message: 'error.admin_required',  // 🔥 IMPORTANT
-		})
-	}
+    if (!header || !header.startsWith("Bearer ")) {
+      return res.status(401).json({
+        success: false,
+        message: "error.admin_required"
+      });
+    }
 
-	const credentials = Buffer.from(authHeader.slice(6), 'base64').toString()
-	const [username, password] = credentials.split(':')
+    const token = header.split(" ")[1];
 
-	// Soddalik uchun hardcoded admin ma'lumotlari
-	if (username === 'admin' && password === 'admin123') {
-		next()
-	} else {
-		res.status(401).json({
-			success: false,
-			message: 'error.invalid_admin_credentials',  // 🔥 IMPORTANT
-		})
-	}
-}
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Ruxsat super admin yoki oddiy admin bo‘lsa beriladi
+    req.admin = {
+      username: decoded.username,
+      adminType: decoded.adminType,
+      sessionId: decoded.sessionId
+    };
+
+    next();
+  } catch (error) {
+    res.status(401).json({
+      success: false,
+      message: "error.invalid_admin_credentials"
+    });
+  }
+};

@@ -1,4 +1,5 @@
 const User = require('../models/User')
+const pool = require('../config/database')
 
 const AVAILABLE_ROOMS = (() => {
   const rooms = []
@@ -16,7 +17,7 @@ const AVAILABLE_ROOMS = (() => {
   return rooms
 })()
 
-// ✅ YANGI: LOGIN FUNCTION
+// ✅ LOGIN FUNCTION
 exports.login = async (req, res) => {
   try {
     const { room_number, full_name } = req.body
@@ -29,9 +30,12 @@ exports.login = async (req, res) => {
       return res.status(400).json({ success: false, message: "errors.room_required" })
     }
 
-    const user = await User.findByRoom(room_number.trim())
+    const user = await User.findByRoomAndName(room_number.trim(), full_name.trim())
 
-    if (user && user.full_name === full_name.trim()) {
+    if (user) {
+      // ✅ last_active_at ni yangilaymiz
+      await User.updateLastActive(user.id)
+      
       return res.json({
         success: true,
         message: "success.login_success",
@@ -54,6 +58,7 @@ exports.login = async (req, res) => {
   }
 }
 
+// ✅ REGISTER FUNCTION - YANGILANGAN (FAQAT BIRINCHI RO'YXATDAN O'TGANDA)
 exports.register = async (req, res) => {
   try {
     const { full_name, room_number } = req.body
@@ -88,21 +93,57 @@ exports.register = async (req, res) => {
       return res.status(400).json({ success: false, message: "errors.room_not_exist" })
     }
 
-    const existingUser = await User.findByRoom(room_number.trim())
-    if (existingUser) {
-      return res.status(400).json({ success: false, message: "errors.room_taken" })
+    try {
+      // ✅ 1. Avval User yaratamiz (asosiy users jadvaliga)
+      const user = await User.create({
+        full_name: full_name.trim(),
+        room_number: room_number.trim(),
+      })
+
+      // ✅ 2. YANGILANGAN: FAQAT BIRINCHI RO'YXATDAN O'TGANDA usersadmin ga yozish
+      try {
+        // Avval bu xonada ro'yxatdan o'tgan bormi tekshiramiz
+        const existingArchiveQuery = 'SELECT id FROM usersadmin WHERE room_number = $1';
+        const existingArchiveResult = await pool.query(existingArchiveQuery, [room_number.trim()]);
+        
+        if (existingArchiveResult.rows.length === 0) {
+          // ✅ FAQAT BIRINCHI RO'YXATDAN O'TGANDA yozamiz
+          await pool.query(`
+            INSERT INTO usersadmin 
+              (user_id, full_name, room_number, registered_at, last_active) 
+            VALUES ($1, $2, $3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+          `, [user.id, full_name.trim(), room_number.trim()]);
+        } else {
+        }
+      } catch (archiveError) {
+        console.error('❌ Usersadmin ga yozishda xato:', archiveError)
+      }
+
+      res.status(201).json({
+        success: true,
+        message: "success.registered",
+        data: user,
+      })
+
+    } catch (error) {
+      // ✅ ROOM_ALREADY_REGISTERED xatosini handle qilamiz
+      if (error.message === 'ROOM_ALREADY_REGISTERED') {
+        return res.status(400).json({
+          success: false,
+          message: "errors.room_already_registered"
+        })
+      }
+      
+      // ✅ UNIQUE constraint xatosini handle qilamiz
+      if (error.code === '23505') {
+        return res.status(400).json({
+          success: false,
+          message: "errors.room_already_registered"
+        })
+      }
+
+      throw error;
     }
-
-    const user = await User.create({
-      full_name: full_name.trim(),
-      room_number: room_number.trim(),
-    })
-
-    res.status(201).json({
-      success: true,
-      message: "success.registered",
-      data: user,
-    })
 
   } catch (error) {
     console.error("User registration error:", error)
@@ -110,6 +151,7 @@ exports.register = async (req, res) => {
   }
 }
 
+// ... (qolgan funksiyalar o'zgarmaydi)
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await User.getAll()
@@ -156,9 +198,12 @@ exports.verifyUser = async (req, res) => {
       return res.status(400).json({ success: false, message: "errors.room_not_exist" })
     }
 
-    const user = await User.findByRoom(room_number.trim())
+    const user = await User.findByRoomAndName(room_number.trim(), full_name.trim())
 
-    if (user && user.full_name === full_name.trim()) {
+    if (user) {
+      // ✅ last_active_at ni yangilaymiz
+      await User.updateLastActive(user.id)
+      
       return res.json({
         success: true,
         exists: true,
