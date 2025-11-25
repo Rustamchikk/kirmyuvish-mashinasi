@@ -35,9 +35,6 @@ function App() {
                   <p className="system-scope">
                     Сервис действует только для общежития №3.
                   </p>
-                  <p className="copyright">
-                    © 2025 Система бронирования стиральных машин. Все права защищены.
-                  </p>
                 </div>
                 <div className="contact-info">
                   <div className="contact-item">
@@ -51,7 +48,7 @@ function App() {
                     className="contact-item telegram-link"
                   >
                      <img 
-                       src="https://u77t4gok6c.ufs.sh/f/wuylBUJoR1VzCuFb93K5GjAD2lHZVBYbNm5voykxwPfKupJ7?filename=Telegram.png" 
+                      src="/telegram.png" 
                       alt="Telegram"
                       className="contact-icon"
                       style={{ width: '20px', height: '20px', marginRight: '6px' }}
@@ -59,6 +56,9 @@ function App() {
                     <span>Telegram: @rus1amm</span>
                   </a>
                 </div>
+                <p className="copyright">
+                    © 2025 Система бронирования стиральных машин. Все права защищены.
+                  </p>
               </div>
             </footer>
           </div>
