@@ -51,7 +51,7 @@ function App() {
                     className="contact-item telegram-link"
                   >
                      <img 
-                      src="https://u77t4gok6c.ufs.sh/f/wuylBUJoR1VzCuFb93K5GjAD2lHZVBYbNm5voykxwPfKupJ7" 
+                       src="https://u77t4gok6c.ufs.sh/f/wuylBUJoR1VzCuFb93K5GjAD2lHZVBYbNm5voykxwPfKupJ7?filename=Telegram.png" 
                       alt="Telegram"
                       className="contact-icon"
                       style={{ width: '20px', height: '20px', marginRight: '6px' }}
