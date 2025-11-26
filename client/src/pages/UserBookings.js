@@ -5,7 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import '../App.css'
 import Loading from '../components/Loading'
-import { bookingAPI, userAPI } from '../services/api'
+import { bookingAPI, userAPI, machineAPI } from '../services/api'
 import { useAuth } from '../contexts/AuthContext'
 
 const UserBookings = () => {
@@ -14,33 +14,38 @@ const UserBookings = () => {
   const { roomNumber } = useParams()
   const { userRoom, userName } = useAuth()
   const [bookings, setBookings] = useState([])
+  const [machines, setMachines] = useState([])
   const [loading, setLoading] = useState(true)
   const [verified, setVerified] = useState(false)
 
   useEffect(() => {
     const targetRoom = roomNumber || userRoom
-    
     if (targetRoom && userName) {
-      verifyAndLoadBookings(targetRoom, userName)
+      verifyAndLoadData(targetRoom, userName)
     } else {
       navigate('/')
     }
   }, [userRoom, userName, roomNumber, navigate])
 
-  const verifyAndLoadBookings = async (room, name) => {
+  const verifyAndLoadData = async (room, name) => {
     try {
-      // Foydalanuvchini qayta tekshiramiz
+      setLoading(true)
       const verifyResponse = await userAPI.verifyUser(room, name)
       
       if (verifyResponse.data.exists) {
         setVerified(true)
-        await loadUserBookings(room)
+        await Promise.all([
+          loadUserBookings(room),
+          loadMachines()
+        ])
       } else {
         navigate('/')
       }
     } catch (error) {
-      console.log(t('userBookings.verificationError'), error)
+      console.error('Verification error:', error)
       navigate('/')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -49,22 +54,37 @@ const UserBookings = () => {
       const response = await bookingAPI.getUserBookings(room)
       setBookings(response.data.data || [])
     } catch (error) {
-      console.log(t('userBookings.loadBookingsError'), error)
-    } finally {
-      setLoading(false)
+      console.error('Load bookings error:', error)
     }
   }
 
-  if (loading) return <Loading />
+  const loadMachines = async () => {
+    try {
+      const response = await machineAPI.getAll()
+      setMachines(response.data.data || [])
+    } catch (error) {
+      console.error('Load machines error:', error)
+    }
+  }
+
+  // Mashina faol yoki o'chirilganligini tekshirish
+  const isMachineActive = (machineName) => {
+    if (!machines.length) return true
+    const machine = machines.find(m => m.name === machineName)
+    return machine ? machine.is_active : true
+  }
+
+  if (loading) {
+    return <Loading />
+  }
 
   if (!verified) {
     return (
       <div className='container'>
-        <div className='form-container'>
-          <h2>{t('userBookings.accessDenied')}</h2>
-          <p>{t('userBookings.accessDeniedMessage')}</p>
+        <div style={{ textAlign: 'center', padding: '2rem' }}>
+          <h2>{t('userBookings.access_denied')}</h2>
           <button onClick={() => navigate('/')} className='btn btn-primary'>
-            {t('userBookings.backToHome')}
+            {t('userBookings.return_to_home')}
           </button>
         </div>
       </div>
@@ -73,87 +93,64 @@ const UserBookings = () => {
 
   return (
     <div className='container'>
-      <div className='user-info'>
-        <h2>{t('userBookings.fullName')}: {userName}</h2>
-        <h2>{t('userBookings.roomNumber')}: {roomNumber || userRoom}</h2>
+      {/* Foydalanuvchi ma'lumotlari */}
+      <div style={{ textAlign: 'center', marginBottom: '2rem', padding: '1rem', color:'#faf6f6ff' }}>
+        <h1>{t('userBookings.my_bookings')}</h1>
+        <div style={{ fontSize: '1.1rem', color: '#faf6f6ff', marginTop: '0.5rem' }}>
+          <strong>{t('userBookings.name')}: </strong>{userName} | <strong>{t('userBookings.room')}: </strong>{roomNumber || userRoom}
+        </div>
       </div>
 
-      <div className='form-container'>
-        <h2>{t('userBookings.bookingList')}</h2>
-        
-        {bookings.length === 0 ? (
-          <div style={{ textAlign: 'center', color: '#666', padding: '3rem' }}>
-            <h3>{t('userBookings.noBookings')}</h3>
-          </div>
-        ) : (
-          <div className='table-responsive'>
-            <table className='table'>
-              <thead>
-                <tr>
-                  <th>{t('userBookings.date')}</th>
-                  <th>{t('userBookings.timeSlot')}</th>
-                  <th>{t('userBookings.machineName')}</th>
-                  <th>{t('userBookings.bookedTime')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {bookings.map(booking => (
-                  <tr key={booking.id}>
-                    <td>
+      {/* Bronlar ro'yxati */}
+      {bookings.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '3rem', color: '#fbf6f6ff' }}>
+          <h3>{t('userBookings.no_bookings')}</h3>
+        </div>
+      ) : (
+        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: 'white', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
+            <thead>
+              <tr style={{ backgroundColor: '#3d5deb', color: 'white' }}>
+                <th style={{ padding: '1rem', textAlign: 'left' }}>{t('userBookings.date')}</th>
+                <th style={{ padding: '1rem', textAlign: 'left' }}>{t('userBookings.time')}</th>
+                <th style={{ padding: '1rem', textAlign: 'left' }}>{t('userBookings.machine')}</th>
+                <th style={{ padding: '1rem', textAlign: 'left' }}>{t('userBookings.status')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {bookings.map(booking => {
+                const machineActive = isMachineActive(booking.machine_name)
+                
+                return (
+                  <tr key={booking.id} style={{ borderBottom: '1px solid #e0e0e0' }}>
+                    <td style={{ padding: '1rem' }}>
                       {format(new Date(booking.booking_date), 'dd.MM.yyyy')}
                     </td>
-                    <td>
-                      <strong>{booking.time_slot}</strong>
+                    <td style={{ padding: '1rem' }}>
+                      {booking.time_slot}
                     </td>
-                    <td>
+                    <td style={{ padding: '1rem' }}>
                       {booking.machine_name}
                     </td>
-                    <td>
-                      {format(new Date(booking.created_at), 'dd.MM.yyyy HH:mm')}
+                    <td style={{ padding: '1rem' }}>
+                      <span style={{ 
+                        padding: '4px 8px', 
+                        borderRadius: '4px', 
+                        fontSize: '0.8rem',
+                        backgroundColor: machineActive ? '#e8f5e8' : '#ffebee',
+                        color: machineActive ? '#2bab31ff' : '#c62828',
+                        border: `1px solid ${machineActive ? '#c8e6c9' : '#ffcdd2'}`
+                      }}>
+                        {machineActive ? t('userBookings.active') : t('userBookings.under_maintenance')}
+                      </span>
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-
-      <style jsx>{`
-        .user-info {
-          background: #f8f9fa;
-          padding: 2rem;
-          border-radius: 8px;
-          margin: 2rem 0;
-          text-align: center;
-        }
-        .user-info h2 {
-          margin: 0.5rem 0;
-          color: #333;
-        }
-        .table-responsive {
-          overflow-x: auto;
-        }
-        .table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-top: 1rem;
-        }
-        .table th,
-        .table td {
-          padding: 1rem;
-          text-align: left;
-          border-bottom: 1px solid #dee2e6;
-        }
-        .table th {
-          background-color: #3d5deb;
-          color: white;
-          font-weight: 600;
-        }
-        .table tr:hover {
-          background-color: #f8f9fa;
-        }
-      `}</style>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   )
 }

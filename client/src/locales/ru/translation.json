@@ -302,7 +302,21 @@
     "bookedTime": "Время бронирования",
     "verificationError": "Ошибка проверки пользователя:",
     "loadBookingsError": "Ошибка загрузки бронирований:",
-	"active": "Активно"
+	"active": "Активно",
+	"title": "Мои Бронирования",
+    "name": "Имя",
+    "room": "Комната",
+    "time": "Время",
+    "machine": "Машина",
+    "status": "Статус",
+    "maintenance": "В ремонте",
+    "makeBooking": "Забронировать",
+	"my_bookings": "Мои Бронирования",
+	 "access_denied": "Доступ запрещен",
+    "return_to_home": "Вернуться на главную страницу",
+    "no_bookings": "Бронирования пока нет",
+    "book_now": "Забронировать",
+	 "under_maintenance": "В ремонте"
   },
   "errors": {
     "name_room_combination_exists": "Эта комбинация имени и номера комнаты уже существует",

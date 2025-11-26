@@ -301,7 +301,21 @@
     "bookedTime": "Booked Time",
     "verificationError": "User verification error:",
     "loadBookingsError": "Error loading bookings:",
-	"active": "Active"
+	"active": "Active",
+	"title": "My Bookings",
+    "name": "Name",
+    "room": "Room",
+    "time": "Time",
+    "machine": "Machine",
+    "status": "Status",
+    "maintenance": "Under Maintenance",
+    "makeBooking": "Make Booking",
+	"my_bookings": "My Bookings",
+	"access_denied": "Access denied",
+    "return_to_home": "Return to home page",
+    "no_bookings": "No bookings available at the moment",
+    "book_now": "Book now",
+	 "under_maintenance": "Under maintenance"
   },
   "errors": {
     "name_room_combination_exists": "This name and room number combination already exists",

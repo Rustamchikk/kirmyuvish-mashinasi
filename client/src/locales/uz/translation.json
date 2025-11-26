@@ -308,6 +308,21 @@
     "bookedTime": "Bron qilingan vaqt",
     "verificationError": "Foydalanuvchini tekshirishda xatolik:",
     "loadBookingsError": "Bronlarni yuklashda xatolik:",
-	"active": "Faol"
+	"title": "Mening Bronlarim",
+    "name": "Ism",
+    "room": "Xona",
+    "time": "Vaqt",
+    "machine": "Mashina",
+    "status": "Holati",
+    "active": "Faol",
+    "maintenance": "Tamirda",
+    "makeBooking": "Bron qilish",
+	"my_bookings": "Mening Bronlarim",
+	"access_denied": "Kirish rad etildi",
+    "return_to_home": "Bosh sahifaga qaytish",
+    "no_bookings": "Hozircha bronlar mavjud emas",
+    "book_now": "Bron qilish",
+    
+    "under_maintenance": "Tamirda"
   }
 }
