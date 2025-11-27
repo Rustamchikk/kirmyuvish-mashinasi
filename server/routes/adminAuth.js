@@ -3,7 +3,16 @@ const express = require('express');
 const router = express.Router();
 const AdminSession = require('../models/AdminSession');
 const db = require('../config/database');
-require('dotenv').config(); // ✅ DOTENV IMPORT
+require('dotenv').config();
+
+// ✅ YANGI: IP olish funktsiyasi
+const getClientIP = (req) => {
+    return req.ip || 
+           req.headers['x-forwarded-for']?.split(',')[0] || 
+           req.headers['x-real-ip'] ||
+           req.connection?.remoteAddress || 
+           '0.0.0.0';
+};
 
 const MAX_ATTEMPTS = 4;
 const LOCK_TIME_MS = 4 * 60 * 1000;
@@ -19,6 +28,7 @@ const adminCredentials = {
     type: 'regular'
   }
 };
+
 // Login attempts ni database dan olish
 const getLoginAttempts = async (username, ipAddress) => {
   try {
@@ -30,6 +40,7 @@ const getLoginAttempts = async (username, ipAddress) => {
     
     return result.rows[0] || null;
   } catch (error) {
+    console.error('❌ Get login attempts error:', error);
     return null;
   }
 };
@@ -62,6 +73,7 @@ const updateLoginAttempts = async (username, ipAddress, attemptData) => {
     
     return true;
   } catch (error) {
+    console.error('❌ Update login attempts error:', error);
     return false;
   }
 };
@@ -84,8 +96,15 @@ const clearLoginAttempts = async (username, ipAddress) => {
 const checkLoginLimit = async (req, res, next) => {
   try {
     const { username } = req.body;
-    const clientIP = req.ip || req.connection.remoteAddress;
+    const clientIP = getClientIP(req);
     
+    console.log(`🔐 Login limit middleware - User: ${username}, IP: ${clientIP}`);
+
+    // Faqat login so'rovlarini tekshirish
+    if (req.method !== 'POST' || !req.path.includes('login') || !username) {
+      return next();
+    }
+
     const attempt = await getLoginAttempts(username, clientIP);
 
     if (attempt && attempt.is_locked && attempt.locked_until) {
@@ -93,6 +112,7 @@ const checkLoginLimit = async (req, res, next) => {
       
       if (lockedUntil > new Date()) {
         const remainingTime = Math.ceil((lockedUntil - new Date()) / 1000 / 60);
+        console.log(`🚫 Account locked in middleware - User: ${username}, Remaining: ${remainingTime}min`);
         return res.status(429).json({
           success: false,
           message: 'admin.account_locked',
@@ -108,7 +128,27 @@ const checkLoginLimit = async (req, res, next) => {
           isLocked: false,
           lockedUntil: null
         });
+        console.log(`✅ Lock expired in middleware - User: ${username} unlocked`);
       }
+    }
+
+    // 🔥 YANGI: IP-based limitni tekshirish (soatiga 10 marta)
+    const ipLimitResult = await db.query(
+      `SELECT COUNT(*) as attempt_count 
+       FROM admin_login_attempts 
+       WHERE ip_address = $1 AND created_at > NOW() - INTERVAL '1 hour'`,
+      [clientIP]
+    );
+
+    const ipAttemptCount = parseInt(ipLimitResult.rows[0].attempt_count);
+    
+    if (ipAttemptCount >= 10) {
+      console.log(`🚫 IP blocked - IP: ${clientIP}, Attempts: ${ipAttemptCount}`);
+      return res.status(429).json({
+        success: false,
+        message: 'ip_address_blocked',
+        data: { remainingTime: '1 hour' }
+      });
     }
 
     next();
@@ -122,10 +162,14 @@ const checkLoginLimit = async (req, res, next) => {
 router.post('/login', checkLoginLimit, async (req, res) => {
   try {
     const { username, password } = req.body;
-    const clientIP = req.ip || req.connection.remoteAddress;
+    const clientIP = getClientIP(req); // 🔥 YANGI: To'g'ri IP olish
+    
+    console.log(`🔐 Login attempt - User: ${username}, IP: ${clientIP}`);
+
     // Admin mavjudligini tekshirish
     const admin = adminCredentials[username];
     if (!admin) {
+      console.log(`❌ User not found: ${username}`);
       return res.status(401).json({
         success: false,
         message: 'auth.invalidCredentials',
@@ -136,9 +180,14 @@ router.post('/login', checkLoginLimit, async (req, res) => {
     // Login attempts ni olish
     const currentAttempt = await getLoginAttempts(username, clientIP);
     const currentCount = currentAttempt ? currentAttempt.attempt_count : 0;
+    
+    console.log(`📊 Current attempts: ${currentCount} for ${username}`);
+
     // Parol xato
     if (admin.password !== password) {
       const newCount = currentCount + 1;
+      console.log(`❌ Wrong password - Attempt ${newCount} for ${username}`);
+      
       if (newCount >= MAX_ATTEMPTS) {
         // 4-ta urinishdan keyin blokirovka
         const lockedUntil = new Date(Date.now() + LOCK_TIME_MS);
@@ -148,6 +197,8 @@ router.post('/login', checkLoginLimit, async (req, res) => {
           isLocked: true,
           lockedUntil: lockedUntil
         });
+        
+        console.log(`🚫 Account locked - User: ${username}, Until: ${lockedUntil}`);
         return res.status(429).json({
           success: false,
           message: 'admin.account_locked_after_attempts',
@@ -167,6 +218,8 @@ router.post('/login', checkLoginLimit, async (req, res) => {
         });
 
         const remainingAttempts = MAX_ATTEMPTS - newCount;
+        console.log(`⚠️ Wrong password - Remaining attempts: ${remainingAttempts}`);
+        
         return res.status(401).json({
           success: false,
           message: 'auth.invalidCredentials',
@@ -179,13 +232,16 @@ router.post('/login', checkLoginLimit, async (req, res) => {
     }
 
     // ✅ TO'G'RI PAROL - Reset va session yaratish
+    console.log(`✅ Successful login - User: ${username}`);
     await clearLoginAttempts(username, clientIP);
+    
     // Session yaratish
     const session = await AdminSession.createSession(
       username,
       { browser: 'Unknown', os: 'Unknown', device: 'Unknown' },
       clientIP
     );
+    
     res.json({
       success: true,
       message: 'admin.login_success',
@@ -196,6 +252,7 @@ router.post('/login', checkLoginLimit, async (req, res) => {
     });
 
   } catch (error) {
+    console.error('❌ Login route error:', error);
     res.status(500).json({
       success: false,
       message: 'errors.server_error'
@@ -269,6 +326,27 @@ router.post('/debug/reset-attempts', async (req, res) => {
       message: 'errors.server_error'
     });
   }
+});
+
+// Test endpoint - IP ni tekshirish
+router.get('/test-ip', (req, res) => {
+  const clientIP = getClientIP(req);
+  
+  res.json({
+    success: true,
+    data: {
+      ip: clientIP,
+      headers: {
+        'x-forwarded-for': req.headers['x-forwarded-for'],
+        'x-real-ip': req.headers['x-real-ip'],
+      },
+      connection: {
+        remoteAddress: req.connection?.remoteAddress,
+        socketRemoteAddress: req.socket?.remoteAddress
+      },
+      trustProxy: req.app.get('trust proxy')
+    }
+  });
 });
 
 module.exports = router;
