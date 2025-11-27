@@ -1,4 +1,3 @@
-// routes/adminAuth.js - FAQAT IP GA QARAB LIMIT
 const express = require('express');
 const router = express.Router();
 const AdminSession = require('../models/AdminSession');
@@ -27,7 +26,6 @@ const adminCredentials = {
   }
 };
 
-// ✅ YANGI: FAQAT IP GA QARAB LOGIN ATTEMPTS NI OLISH
 const getIPLoginAttempts = async (ipAddress) => {
   try {
     const result = await db.query(
@@ -40,12 +38,10 @@ const getIPLoginAttempts = async (ipAddress) => {
     
     return result.rows[0] || null;
   } catch (error) {
-    console.error('❌ Get IP login attempts error:', error);
     return null;
   }
 };
 
-// ✅ YANGI: FAQAT IP GA QARAB LOGIN ATTEMPTS NI YANGILASH
 const updateIPLoginAttempts = async (ipAddress, attemptData) => {
   try {
     const { attemptCount, isLocked, lockedUntil, username } = attemptData;
@@ -53,7 +49,6 @@ const updateIPLoginAttempts = async (ipAddress, attemptData) => {
     const existing = await getIPLoginAttempts(ipAddress);
     
     if (existing) {
-      // Update existing record
       await db.query(
         `UPDATE admin_login_attempts 
          SET attempt_count = $1, is_locked = $2, locked_until = $3, 
@@ -63,7 +58,6 @@ const updateIPLoginAttempts = async (ipAddress, attemptData) => {
         [attemptCount, isLocked, lockedUntil, username || 'unknown', ipAddress]
       );
     } else {
-      // Insert new record
       await db.query(
         `INSERT INTO admin_login_attempts 
          (username, ip_address, attempt_count, is_locked, locked_until) 
@@ -74,12 +68,10 @@ const updateIPLoginAttempts = async (ipAddress, attemptData) => {
     
     return true;
   } catch (error) {
-    console.error('❌ Update IP login attempts error:', error);
     return false;
   }
 };
 
-// ✅ YANGI: FAQAT IP GA QARAB LOGIN ATTEMPTS NI O'CHIRISH
 const clearIPLoginAttempts = async (ipAddress) => {
   try {
     await db.query(
@@ -88,25 +80,19 @@ const clearIPLoginAttempts = async (ipAddress) => {
     );
     return true;
   } catch (error) {
-    console.error('❌ Clear IP login attempts error:', error);
     return false;
   }
 };
 
-// ✅ YANGI: FAQAT IP GA QARAB LIMIT MIDDLEWARE
 const checkLoginLimit = async (req, res, next) => {
   try {
     const { username } = req.body;
     const clientIP = getClientIP(req);
-    
-    console.log(`🔐 Login limit middleware - IP: ${clientIP}, User: ${username}`);
 
-    // Faqat login so'rovlarini tekshirish
     if (req.method !== 'POST' || !req.path.includes('login') || !username) {
       return next();
     }
 
-    // ✅ FAQAT IP GA QARAB TEKSHIRAMIZ
     const attempt = await getIPLoginAttempts(clientIP);
 
     if (attempt && attempt.is_locked && attempt.locked_until) {
@@ -114,7 +100,6 @@ const checkLoginLimit = async (req, res, next) => {
       
       if (lockedUntil > new Date()) {
         const remainingTime = Math.ceil((lockedUntil - new Date()) / 1000 / 60);
-        console.log(`🚫 IP LOCKED - IP: ${clientIP}, Remaining: ${remainingTime}min`);
         return res.status(429).json({
           success: false,
           message: 'ip_address_blocked',
@@ -124,48 +109,36 @@ const checkLoginLimit = async (req, res, next) => {
           }
         });
       } else {
-        // Blokirovka vaqti tugagan, reset qilamiz
         await updateIPLoginAttempts(clientIP, {
           attemptCount: 0,
           isLocked: false,
           lockedUntil: null,
           username: 'unknown'
         });
-        console.log(`✅ IP UNLOCKED - IP: ${clientIP}`);
       }
     }
 
     next();
   } catch (error) {
-    console.error('❌ Login limit check error:', error);
     next();
   }
 };
 
-// ✅ YANGI: FAQAT IP GA QARAB ADMIN LOGIN
 router.post('/login', checkLoginLimit, async (req, res) => {
   try {
     const { username, password } = req.body;
     const clientIP = getClientIP(req);
-    
-    console.log(`🔐 Login attempt - IP: ${clientIP}, User: ${username}`);
 
-    // ✅ FAQAT IP GA QARAB LOGIN ATTEMPTS NI OLAMIZ
     const currentAttempt = await getIPLoginAttempts(clientIP);
     const currentCount = currentAttempt ? currentAttempt.attempt_count : 0;
-    
-    console.log(`📊 IP Attempts: ${currentCount} for IP: ${clientIP}`);
 
-    // ✅ HAR QANDAY NOTO'G'RI KIRISH UCHUN (login yoki parol)
     const admin = adminCredentials[username];
     const isInvalidLogin = !admin || admin.password !== password;
 
     if (isInvalidLogin) {
       const newCount = currentCount + 1;
-      console.log(`❌ INVALID LOGIN - IP: ${clientIP}, Attempt: ${newCount}`);
       
       if (newCount >= MAX_ATTEMPTS) {
-        // 4-ta urinishdan keyin blokirovka
         const lockedUntil = new Date(Date.now() + LOCK_TIME_MS);
         
         await updateIPLoginAttempts(clientIP, {
@@ -175,7 +148,6 @@ router.post('/login', checkLoginLimit, async (req, res) => {
           username: username
         });
         
-        console.log(`🚫 IP BLOCKED - IP: ${clientIP}, Until: ${lockedUntil}`);
         return res.status(429).json({
           success: false,
           message: 'ip_address_blocked',
@@ -186,7 +158,6 @@ router.post('/login', checkLoginLimit, async (req, res) => {
           }
         });
       } else {
-        // Urinishlar sonini yangilash
         await updateIPLoginAttempts(clientIP, {
           attemptCount: newCount,
           isLocked: false,
@@ -195,7 +166,6 @@ router.post('/login', checkLoginLimit, async (req, res) => {
         });
 
         const remainingAttempts = MAX_ATTEMPTS - newCount;
-        console.log(`⚠️ INVALID LOGIN - IP: ${clientIP}, Remaining: ${remainingAttempts}`);
         
         return res.status(401).json({
           success: false,
@@ -207,8 +177,6 @@ router.post('/login', checkLoginLimit, async (req, res) => {
       }
     }
 
-    // ✅ TO'G'RI LOGIN VA PAROL - Reset va session yaratish
-    console.log(`✅ SUCCESSFUL LOGIN - IP: ${clientIP}, User: ${username}`);
     await clearIPLoginAttempts(clientIP);
     
     const session = await AdminSession.createSession(
@@ -227,7 +195,6 @@ router.post('/login', checkLoginLimit, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Login route error:', error);
     res.status(500).json({
       success: false,
       message: 'errors.server_error'
@@ -235,7 +202,6 @@ router.post('/login', checkLoginLimit, async (req, res) => {
   }
 });
 
-// Debug endpoint - login attempts holatini ko'rish
 router.get('/debug/attempts', async (req, res) => {
   try {
     const result = await db.query(
@@ -265,7 +231,6 @@ router.get('/debug/attempts', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('❌ Debug attempts error:', error);
     res.status(500).json({
       success: false,
       message: 'errors.server_error'
@@ -273,7 +238,6 @@ router.get('/debug/attempts', async (req, res) => {
   }
 });
 
-// Reset attempts (debug uchun)
 router.post('/debug/reset-attempts', async (req, res) => {
   try {
     const { ip } = req.body;
@@ -296,7 +260,6 @@ router.post('/debug/reset-attempts', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('❌ Reset attempts error:', error);
     res.status(500).json({
       success: false,
       message: 'errors.server_error'
@@ -304,7 +267,6 @@ router.post('/debug/reset-attempts', async (req, res) => {
   }
 });
 
-// Test endpoint - IP ni tekshirish
 router.get('/test-ip', (req, res) => {
   const clientIP = getClientIP(req);
   
