@@ -1,11 +1,11 @@
-// routes/adminAuth.js - DOTENV BILAN YANGILANGAN VERSIYA
+// routes/adminAuth.js - TO'LIQ YANGILANGAN VERSIYA
 const express = require('express');
 const router = express.Router();
 const AdminSession = require('../models/AdminSession');
 const db = require('../config/database');
 require('dotenv').config();
 
-// ✅ YANGI: IP olish funktsiyasi
+// ✅ IP olish funktsiyasi
 const getClientIP = (req) => {
     return req.ip || 
            req.headers['x-forwarded-for']?.split(',')[0] || 
@@ -92,7 +92,7 @@ const clearLoginAttempts = async (username, ipAddress) => {
   }
 };
 
-// Login limit middleware
+// ✅ YANGI: HAR QANDAY NOTO'G'RI LOGIN UCHUN LIMIT MIDDLEWARE
 const checkLoginLimit = async (req, res, next) => {
   try {
     const { username } = req.body;
@@ -105,6 +105,7 @@ const checkLoginLimit = async (req, res, next) => {
       return next();
     }
 
+    // ✅ HAR QANDAY USERNAME UCHUN TEKSHIRAMIZ (mavjud bo'lmasa ham)
     const attempt = await getLoginAttempts(username, clientIP);
 
     if (attempt && attempt.is_locked && attempt.locked_until) {
@@ -132,7 +133,7 @@ const checkLoginLimit = async (req, res, next) => {
       }
     }
 
-    // 🔥 YANGI: IP-based limitni tekshirish (soatiga 10 marta)
+    // IP-based limitni tekshirish (soatiga 10 marta)
     const ipLimitResult = await db.query(
       `SELECT COUNT(*) as attempt_count 
        FROM admin_login_attempts 
@@ -158,35 +159,27 @@ const checkLoginLimit = async (req, res, next) => {
   }
 };
 
-// Admin login
+// ✅ YANGI: HAR QANDAY NOTO'G'RI LOGIN UCHUN ADMIN LOGIN
 router.post('/login', checkLoginLimit, async (req, res) => {
   try {
     const { username, password } = req.body;
-    const clientIP = getClientIP(req); // 🔥 YANGI: To'g'ri IP olish
+    const clientIP = getClientIP(req);
     
     console.log(`🔐 Login attempt - User: ${username}, IP: ${clientIP}`);
 
-    // Admin mavjudligini tekshirish
-    const admin = adminCredentials[username];
-    if (!admin) {
-      console.log(`❌ User not found: ${username}`);
-      return res.status(401).json({
-        success: false,
-        message: 'auth.invalidCredentials',
-        data: { remainingAttempts: null }
-      });
-    }
-
-    // Login attempts ni olish
+    // ✅ HAR QANDAY USERNAME UCHUN LOGIN ATTEMPTS NI OLAMIZ
     const currentAttempt = await getLoginAttempts(username, clientIP);
     const currentCount = currentAttempt ? currentAttempt.attempt_count : 0;
     
     console.log(`📊 Current attempts: ${currentCount} for ${username}`);
 
-    // Parol xato
-    if (admin.password !== password) {
+    // ✅ HAR QANDAY NOTO'G'RI KIRISH UCHUN (login yoki parol)
+    const admin = adminCredentials[username];
+    const isInvalidLogin = !admin || admin.password !== password;
+
+    if (isInvalidLogin) {
       const newCount = currentCount + 1;
-      console.log(`❌ Wrong password - Attempt ${newCount} for ${username}`);
+      console.log(`❌ Invalid login - Attempt ${newCount} for ${username}`);
       
       if (newCount >= MAX_ATTEMPTS) {
         // 4-ta urinishdan keyin blokirovka
@@ -218,7 +211,7 @@ router.post('/login', checkLoginLimit, async (req, res) => {
         });
 
         const remainingAttempts = MAX_ATTEMPTS - newCount;
-        console.log(`⚠️ Wrong password - Remaining attempts: ${remainingAttempts}`);
+        console.log(`⚠️ Invalid login - Remaining attempts: ${remainingAttempts}`);
         
         return res.status(401).json({
           success: false,
@@ -231,7 +224,7 @@ router.post('/login', checkLoginLimit, async (req, res) => {
       }
     }
 
-    // ✅ TO'G'RI PAROL - Reset va session yaratish
+    // ✅ TO'G'RI LOGIN VA PAROL - Reset va session yaratish
     console.log(`✅ Successful login - User: ${username}`);
     await clearLoginAttempts(username, clientIP);
     
