@@ -174,8 +174,7 @@ const Register = ({ onRegister }) => {
           />
         </div>
 
-        {/* CSS class ishlating: */}
-        <div className='button-group'>
+        <div style={{ display: 'flex', gap: '1rem', flexDirection: 'column' }}>
           <button 
             type='button' 
             onClick={handleSubmit} 

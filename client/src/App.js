@@ -9,6 +9,7 @@ import Home from './pages/Home'
 import Admin from './pages/Admin'
 import UserBookings from './pages/UserBookings'
 import './App.css'
+import './index.css';
 
 function App() {
   return (

@@ -25,13 +25,13 @@
     display: block;
     font-size: 1.8rem;
     font-weight: bold;
-    color: #f4f5f6;
+    color: #101010;
     margin-bottom: 0.5rem;
 }
 
 .stat-label {
     font-size: 0.9rem;
-    color: #e8ebed;
+    color: #161617;
 }
 
 .btn-info {
