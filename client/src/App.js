@@ -41,8 +41,6 @@ function App() {
                   
                   <div className="contact-info">
                     <div className="contact-item">
-                      <span className="contact-icon">📞</span>
-                      <span>+7 967 981 86 70</span>
                     </div>
                     <a 
                       href="https://t.me/rus1amm" 
@@ -56,7 +54,7 @@ function App() {
                         className="contact-icon"
                         style={{ width: '20px', height: '20px', marginRight: '6px' }}
                       />
-                      <span>Telegram: @rus1amm</span>
+                      <span>Designet by: @rus1amm</span>
                     </a>
                   </div>
                 </div>
