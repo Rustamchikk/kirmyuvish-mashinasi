@@ -21,13 +21,9 @@
 	},
 	"scripts": {
 		"start": "react-scripts start",
-		"build": "GENERATE_SOURCEMAP=false DISABLE_ESLINT_PLUGIN=true CI=true react-scripts build",
-		"build:prod": "npm run build && npm run postbuild",
-		"postbuild": "node scripts/clean-console.js",
+		"build": "react-scripts build",
 		"test": "react-scripts test",
-		"eject": "react-scripts eject",
-		"deploy": "vercel --prod",
-		"predeploy": "npm run build:prod"
+		"eject": "react-scripts eject"
 	},
 	"browserslist": {
 		"production": [
