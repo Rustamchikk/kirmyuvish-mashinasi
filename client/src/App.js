@@ -54,7 +54,7 @@ function App() {
                         className="contact-icon"
                         style={{ width: '20px', height: '20px', marginRight: '6px' }}
                       />
-                      <span>Designet by: @rus1amm</span>
+                      <span>Designed by: @rus1amm</span>
                     </a>
                   </div>
                 </div>
