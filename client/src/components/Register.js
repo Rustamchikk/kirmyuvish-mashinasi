@@ -13,7 +13,7 @@ const Register = ({ onRegister }) => {
   const navigate = useNavigate()
   const [user, setUser] = useState({ full_name: '', room_number: '' })
   const [alert, setAlert] = useState({ type: '', message: '' })
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState({ register: false, view: false })
   const [availableRooms, setAvailableRooms] = useState([])
   const [roomsLoading, setRoomsLoading] = useState(true)
 
@@ -88,7 +88,7 @@ const Register = ({ onRegister }) => {
       return
     }
 
-    setLoading(true)
+    setLoading({ register: true, view: false })
 
     try {
       const response = await userAPI.register(user)
@@ -109,7 +109,7 @@ const Register = ({ onRegister }) => {
 
       showAlert('error', errorMessage)
     } finally {
-      setLoading(false)
+      setLoading({ register: false, view: false })
     }
   }
 
@@ -121,7 +121,7 @@ const Register = ({ onRegister }) => {
       return
     }
 
-    setLoading(true)
+    setLoading({ register: false, view: true })
     try {
       const response = await userAPI.verifyUser(user.room_number, user.full_name)
 
@@ -141,7 +141,7 @@ const Register = ({ onRegister }) => {
 
       showAlert('error', errorMessage)
     } finally {
-      setLoading(false)
+      setLoading({ register: false, view: false })
     }
   }
 
@@ -158,7 +158,7 @@ const Register = ({ onRegister }) => {
             value={user.full_name}
             onChange={e => setUser({ ...user, full_name: e.target.value })}
             required
-            disabled={loading}
+            disabled={loading.register || loading.view}
           />
         </div>
 
@@ -170,7 +170,7 @@ const Register = ({ onRegister }) => {
             onChange={e => setUser({ ...user, room_number: e.target.value.replace(/[^0-9]/g, '') })}
             required
             maxLength='3'
-            disabled={loading}
+            disabled={loading.register || loading.view}
           />
         </div>
 
@@ -178,19 +178,19 @@ const Register = ({ onRegister }) => {
           <button 
             type='button' 
             onClick={handleSubmit} 
-            className='btn btn-primary' 
-            disabled={loading}
+            className={`btn btn-primary ${loading.register ? 'loading' : ''}`}
+            disabled={loading.register || loading.view}
           >
-            {loading ? t('register.loading') : t('register.registerButton')}
+            {t('register.registerButton')}
           </button>
           
           <button 
             type='button' 
             onClick={handleViewBookings} 
-            className='btn btn-secondary'
-            disabled={loading}
+            className={`btn btn-secondary ${loading.view ? 'loading' : ''}`}
+            disabled={loading.register || loading.view}
           >
-            {loading ? t('register.checking') : t('register.viewBookingsButton')}
+            {t('register.viewBookingsButton')}
           </button>
         </div>
       </form>
