@@ -364,13 +364,13 @@ const Home = () => {
               </p>
             </div>
 
-            <button
-              type='submit'
-              className='btn btn-success'
-              disabled={loading || !selectedMachine}
-            >
-              {loading ? t('booking.booking') : t('booking.book')}
-            </button>
+                <button
+                  type='submit'
+                  className={`btn btn-success ${loading ? 'loading' : ''}`}
+                  disabled={loading || !selectedMachine}
+                >
+                  {loading ? '' : t('booking.book')}
+                </button>
           </form>
         </section>
       )}
