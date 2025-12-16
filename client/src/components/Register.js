@@ -192,7 +192,6 @@ const Register = ({ onRegister }) => {
           </LoadingButton>
       </div>
 
-
       </form>
     </div>
   )
