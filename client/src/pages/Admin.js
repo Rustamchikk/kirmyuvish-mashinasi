@@ -3,7 +3,7 @@ import { format } from 'date-fns'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import '../App.css'
-import '../brons.css';
+import '../SuperAdmin.css';
 import Alert from '../components/Alert'
 import Loading from '../components/Loading'
 import SessionModal from '../components/SessionModal'

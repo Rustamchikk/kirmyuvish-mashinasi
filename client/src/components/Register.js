@@ -175,24 +175,24 @@ const Register = ({ onRegister }) => {
         </div>
 
         <div style={{ display: 'flex', gap: '1rem', flexDirection: 'column' }}>
-          <button 
-            type='button' 
+          <LoadingButton 
             onClick={handleSubmit} 
-            className='btn btn-primary' 
-            disabled={loading}
+            loading={loading} 
+            className='btn btn-primary'
           >
-            {loading ? t('register.loading') : t('register.registerButton')}
-          </button>
-          
-          <button 
-            type='button' 
+            {t('register.registerButton')}
+          </LoadingButton>
+
+          <LoadingButton 
             onClick={handleViewBookings} 
+            loading={loading} 
             className='btn btn-secondary'
-            disabled={loading}
           >
-            {loading ? t('register.checking') : t('register.viewBookingsButton')}
-          </button>
-        </div>
+            {t('register.viewBookingsButton')}
+          </LoadingButton>
+      </div>
+
+
       </form>
     </div>
   )
