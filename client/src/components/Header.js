@@ -112,28 +112,31 @@ const Header = () => {
           <div className='header-right'>
             <div className="language-wrapper" ref={languageDropdownRef}>
               <button 
-                className="global-icon-btn"
-                onClick={() => setLanguageDropdownOpen(!languageDropdownOpen)}
-                aria-label={t('header.changeLanguage')}
-              >
-                <Globe size={20} />
-              </button>
-              
-              <div className={`language-dropdown-container ${languageDropdownOpen ? 'open' : ''}`}>
-                <div className="language-dropdown-content">
-                  <div className="language-options">
-                    {languages.map(lang => (
-                      <button
-                        key={lang.code}
-                        className={`language-option ${i18n.language === lang.code ? 'active' : ''}`}
-                        onClick={() => changeLanguage(lang.code)}
-                      >
-                        <span className="language-flag">{lang.flag}</span>
-                        <span className="language-name">{lang.name}</span>
-                        {i18n.language === lang.code && (
-                          <span className="selected-indicator">✓</span>
-                        )}
-                      </button>
+    className="global-icon-btn"
+    onClick={() => setLanguageDropdownOpen(!languageDropdownOpen)}
+    aria-label={t('header.changeLanguage')}
+  >
+    <div className="language-display">
+      <Globe size={16} className="globe-icon" />
+      <span className="current-language-flag">{currentLanguage.flag}</span>
+    </div>
+  </button>
+  
+  <div className={`language-dropdown-container ${languageDropdownOpen ? 'open' : ''}`}>
+    <div className="language-dropdown-content">
+      <div className="language-options">
+        {languages.map(lang => (
+          <button
+            key={lang.code}
+            className={`language-option ${i18n.language === lang.code ? 'active' : ''}`}
+            onClick={() => changeLanguage(lang.code)}
+          >
+            <span className="language-flag">{lang.flag}</span>
+            <span className="language-name">{lang.name}</span>
+            {i18n.language === lang.code && (
+              <span className="selected-indicator">✓</span>
+            )}
+          </button>
                     ))}
                   </div>
                 </div>
