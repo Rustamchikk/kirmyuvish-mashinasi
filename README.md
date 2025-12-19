@@ -47,21 +47,3 @@ Shu bilan tamom! 😊
 ## Dasturchilar uchun
  **⚙️ O‘rnatish va ishga tushirish**
  Loyiha client va server qismlardan iborat.
-
-1. **Install npm install**
-2. **Clone the repository:**
-   ```bash
-   git clone https://github.com/.......
-
-3. **Client (Frontend) ni ishga tushirish**
-   ```bash
-   cd client
-    npm install
-    npm start
-   ```
-4. **Server (Backend) ni ishga tushirish**
-```bash
-   cd server
-    npm install
-    npm run dev
-   ```
