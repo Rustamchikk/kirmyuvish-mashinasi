@@ -558,7 +558,7 @@
   border-radius: 8px;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
-  width: 42px;
+  width: 60px;
   height: 42px;
 }
 
@@ -665,7 +665,7 @@
   }
   
   .global-icon-btn {
-    width: 38px;
+    width: 48px;
     height: 38px;
     padding: 0.4rem;
   }
@@ -700,7 +700,7 @@
   }
   
   .global-icon-btn {
-    width: 36px;
+    width: 48px;
     height: 36px;
     padding: 0.35rem;
   }
@@ -746,7 +746,7 @@
   }
   
   .global-icon-btn {
-    width: 34px;
+    width: 45px;
     height: 34px;
     padding: 0.3rem;
   }
@@ -1443,7 +1443,7 @@
   }
   
   .global-icon-btn {
-    width: 38px;
+    width: 47px;
     height: 38px;
     padding: 0.4rem;
   }
@@ -1478,7 +1478,7 @@
   }
   
   .global-icon-btn {
-    width: 36px;
+    width: 48px;
     height: 36px;
     padding: 0.35rem;
   }
@@ -1524,7 +1524,7 @@
   }
   
   .global-icon-btn {
-    width: 34px;
+    width: 43px;
     height: 34px;
     padding: 0.3rem;
   }
