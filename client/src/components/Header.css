@@ -389,3 +389,244 @@
 						overflow-y: auto;
 					}
 				}
+/* Header.css ga qo'shiladigan yangi til stillari */
+
+/* Language Wrapper */
+.language-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 42px;
+}
+
+/* Global Icon Button */
+.global-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  width: 42px;
+  height: 42px;
+}
+
+.global-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+/* Language Dropdown Container */
+.language-dropdown-container {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  z-index: 1002;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+}
+
+.language-dropdown-container.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.language-dropdown-content {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 0.75rem;
+  min-width: 180px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(20px);
+}
+
+.dropdown-header {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.language-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.language-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  width: 100%;
+}
+
+.language-option:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateX(3px);
+}
+
+.language-option.active {
+  background: rgba(255, 255, 255, 0.25);
+  font-weight: 600;
+}
+
+.language-flag {
+  font-size: 1.5rem;
+  line-height: 1;
+  width: 30px;
+  text-align: center;
+}
+
+.language-name {
+  flex: 1;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.selected-indicator {
+  color: #4ade80;
+  font-weight: bold;
+  margin-left: 0.5rem;
+}
+
+/* ========== RESPONSIVE ========== */
+
+/* Tablet */
+@media (max-width: 768px) {
+  .language-wrapper {
+    height: 38px;
+  }
+  
+  .global-icon-btn {
+    width: 38px;
+    height: 38px;
+    padding: 0.4rem;
+  }
+  
+  .global-icon-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .language-dropdown-content {
+    min-width: 160px;
+  }
+  
+  .language-option {
+    padding: 0.6rem 0.8rem;
+  }
+  
+  .language-flag {
+    font-size: 1.3rem;
+    width: 25px;
+  }
+  
+  .language-name {
+    font-size: 0.9rem;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .language-wrapper {
+    height: 36px;
+  }
+  
+  .global-icon-btn {
+    width: 36px;
+    height: 36px;
+    padding: 0.35rem;
+  }
+  
+  .global-icon-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .language-dropdown-container {
+    right: -50%;
+  }
+  
+  .language-dropdown-content {
+    min-width: 140px;
+    padding: 0.6rem;
+  }
+  
+  .dropdown-header {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.6rem;
+  }
+  
+  .language-option {
+    padding: 0.5rem 0.6rem;
+    gap: 0.5rem;
+  }
+  
+  .language-flag {
+    font-size: 1.2rem;
+    width: 22px;
+  }
+  
+  .language-name {
+    font-size: 0.85rem;
+  }
+}
+
+/* Kichik ekranlar */
+@media (max-width: 360px) {
+  .language-wrapper {
+    height: 34px;
+  }
+  
+  .global-icon-btn {
+    width: 34px;
+    height: 34px;
+    padding: 0.3rem;
+  }
+  
+  .language-dropdown-content {
+    min-width: 130px;
+  }
+  
+  .language-option {
+    padding: 0.4rem 0.5rem;
+  }
+  
+  .language-flag {
+    font-size: 1.1rem;
+    width: 20px;
+  }
+  
+  .language-name {
+    font-size: 0.8rem;
+  }
+}
+
+/* Landscape mode for mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+  .language-dropdown-content {
+    max-height: 200px;
+    overflow-y: auto;
+  }
+}				
