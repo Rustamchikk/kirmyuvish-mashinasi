@@ -11,70 +11,89 @@ const Header = () => {
   const { t, i18n } = useTranslation()
   const [menuOpen, setMenuOpen] = useState(false)
   const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false)
+  
   const languageDropdownRef = useRef(null)
+  const menuDropdownRef = useRef(null)
+  
   const { logout, adminLogout, isAuthenticated, userRoom, isAdmin } = useAuth()
   const navigate = useNavigate()
 
-  // Click outside to close language dropdown
+  // Language dropdown uchun click outside
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (languageDropdownRef.current && !languageDropdownRef.current.contains(event.target)) {
-        setLanguageDropdownOpen(false)
+    const handleLanguageClickOutside = (event) => {
+      if (languageDropdownOpen && 
+          languageDropdownRef.current && 
+          !languageDropdownRef.current.contains(event.target)) {
+        setLanguageDropdownOpen(false);
       }
+    };
+
+    if (languageDropdownOpen) {
+      document.addEventListener('mousedown', handleLanguageClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleLanguageClickOutside);
     }
 
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+    return () => {
+      document.removeEventListener('mousedown', handleLanguageClickOutside);
+    };
+  }, [languageDropdownOpen]);
+
+  // Menu dropdown uchun click outside
+  useEffect(() => {
+    const handleMenuClickOutside = (event) => {
+      if (menuOpen && 
+          menuDropdownRef.current && 
+          !menuDropdownRef.current.contains(event.target) &&
+          !event.target.closest('.menu-toggle')) {
+        setMenuOpen(false);
+      }
+    };
+
+    if (menuOpen) {
+      document.addEventListener('mousedown', handleMenuClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleMenuClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleMenuClickOutside);
+    };
+  }, [menuOpen]);
 
   const changeLanguage = (lng) => {
-    i18n.changeLanguage(lng)
-    setLanguageDropdownOpen(false)
-  }
+    i18n.changeLanguage(lng);
+    setLanguageDropdownOpen(false);
+  };
 
   const handleExit = () => {
     if (isAuthenticated) {
       if (isAdmin) {
-        adminLogout()
+        adminLogout();
       } else {
-        logout()
+        logout();
       }
-      navigate('/')
-      setMenuOpen(false)
+      navigate('/');
+      setMenuOpen(false);
     } else {
-      console.log('Exit clicked - not authenticated')
+      console.log('Exit clicked - not authenticated');
     }
-  }
+  };
 
   // Tillar ma'lumotlari obyekti
   const languages = [
-    {
-      code: 'uz',
-      name: 'Oʻzbekcha',
-      flag: '🇺🇿'
-    },
-    {
-      code: 'en', 
-      name: 'English',
-      flag: '🇬🇧'
-    },
-    {
-      code: 'ru',
-      name: 'Русский',
-      flag: '🇷🇺'
-    }
-  ]
+    { code: 'uz', name: 'Oʻzbekcha', flag: '🇺🇿' },
+    { code: 'en', name: 'English', flag: '🇬🇧' },
+    { code: 'ru', name: 'Русский', flag: '🇷🇺' }
+  ];
 
-  const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0]
+  const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
 
   return (
     <>
-      {/* HEADER */}
       <header className='main-header'>
         <div className='header-container'>
-          {/* Chap tomondagi elementlar */}
           <div className='header-left'>
-            {/* Menu Toggle */}
             <button
               className='menu-toggle'
               onClick={() => setMenuOpen(!menuOpen)}
@@ -83,7 +102,6 @@ const Header = () => {
               {menuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
 
-            {/* Logo */}
             <div className='logo'>
               <div className='logo-text'>
                 <div className='logo-title'>{t('header.logo')}</div>
@@ -91,11 +109,8 @@ const Header = () => {
             </div>
           </div>
 
-          {/* O'ng tomondagi elementlar */}
           <div className='header-right'>
-            {/* Language Switcher */}
             <div className="language-wrapper" ref={languageDropdownRef}>
-              {/* Global Icon Button - Faqat globus rasmi ko'rinadi */}
               <button 
                 className="global-icon-btn"
                 onClick={() => setLanguageDropdownOpen(!languageDropdownOpen)}
@@ -104,7 +119,6 @@ const Header = () => {
                 <Globe size={20} />
               </button>
               
-              {/* Language Dropdown - Faqat globus bosilganda ko'rinadi */}
               <div className={`language-dropdown-container ${languageDropdownOpen ? 'open' : ''}`}>
                 <div className="language-dropdown-content">
                   <div className="language-options">
@@ -126,17 +140,17 @@ const Header = () => {
               </div>
             </div>
 
-            {/* Exit Button */}
-            <button className='exit-btn' onClick={handleExit}>
-              <LogOut size={18} />
-              <span className='exit-text'></span>
-              <span className='exit-icon'></span>
+            <button className='exit-btn-icon-only' onClick={handleExit}>
+              <div className="exit-icon-wrapper">
+                <LogOut size={20} className="exit-icon" />
+                <div className="exit-icon-circle"></div>
+              </div>
             </button>
           </div>
         </div>
 
-        {/* Dropdown Menu */}
-        <div className={`dropdown-menu ${menuOpen ? 'open' : ''}`}>
+        {/* Dropdown Menu - ref qo'shildi */}
+        <div className={`dropdown-menu ${menuOpen ? 'open' : ''}`} ref={menuDropdownRef}>
           <Link to='/' className='dropdown-item' onClick={() => setMenuOpen(false)}>
             <Home size={20} />
             <span>{t('header.home')}</span>
@@ -151,4 +165,4 @@ const Header = () => {
   )
 }
 
-export default Header
+export default Header;

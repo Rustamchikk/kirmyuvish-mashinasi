@@ -153,38 +153,184 @@
 					color: white;
 				}
 
-				/* Exit Button */
-				.exit-btn {
-					display: flex;
-					align-items: center;
-					gap: 0.5rem;
-					color: white;
-					background: rgba(239, 68, 68, 0.2);
-					border: 1.5px solid rgba(239, 68, 68, 0.4);
-					padding: 0.5rem 0.8rem;
-					border-radius: 8px;
-					font-weight: 500;
-					font-size: 0.85rem;
-					cursor: pointer;
-					transition: all 0.3s ease;
-					backdrop-filter: blur(10px);
-					flex-shrink: 0;
-					height: 42px;
-				}
+				/* Exit Button - Faqat Ikonka */
+.exit-btn-icon-only {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.1) 100%);
+  border: 1.5px solid rgba(239, 68, 68, 0.25);
+  border-radius: 12px;
+  color: #fca5a5;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  position: relative;
+  padding: 0;
+  overflow: visible;
+}
 
-				.exit-btn:hover {
-					background: rgba(239, 68, 68, 0.3);
-					transform: translateY(-1px);
-					box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
-				}
+.exit-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  transition: transform 0.3s ease;
+}
 
-				.exit-text {
-					display: inline;
-				}
+.exit-icon {
+  position: relative;
+  z-index: 2;
+  transition: all 0.3s ease;
+}
 
-				.exit-icon {
-					display: none;
-				}
+.exit-icon-circle {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.2) 0%, transparent 70%);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Hover effektlari */
+.exit-btn-icon-only:hover {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(220, 38, 38, 0.2) 100%);
+  border-color: rgba(239, 68, 68, 0.45);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 6px 20px rgba(239, 68, 68, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.exit-btn-icon-only:hover .exit-icon {
+  color: #f87171;
+  transform: translateX(1px);
+}
+
+.exit-btn-icon-only:hover .exit-icon-circle {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* Active holati */
+.exit-btn-icon-only:active {
+  transform: translateY(0);
+  transition: transform 0.1s;
+}
+
+.exit-btn-icon-only:active .exit-icon-wrapper {
+  transform: scale(0.95);
+}
+
+/* Tooltip (hover qilganda chiqadigan matn) */
+.exit-btn-tooltip {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: rgba(15, 23, 42, 0.95);
+  color: #f1f5f9;
+  padding: 0.5rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.exit-btn-tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid rgba(15, 23, 42, 0.95);
+}
+
+.exit-btn-icon-only:hover .exit-btn-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Responsive dizayn */
+@media (max-width: 768px) {
+  .exit-btn-icon-only {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .exit-icon-wrapper {
+    width: 22px;
+    height: 22px;
+  }
+  
+  .exit-icon {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .exit-btn-tooltip {
+    display: none; /* Mobilda tooltip ko'rsatilmasin */
+  }
+}
+
+@media (max-width: 480px) {
+  .exit-btn-icon-only {
+    width: 38px;
+    height: 38px;
+  }
+  
+  .exit-icon-wrapper {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* Dark/Light theme qo'llash */
+[data-theme="dark"] .exit-btn-icon-only {
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+[data-theme="dark"] .exit-btn-tooltip {
+  background: rgba(30, 41, 59, 0.95);
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .exit-btn-tooltip::after {
+  border-top-color: rgba(30, 41, 59, 0.95);
+}
+
+[data-theme="light"] .exit-btn-icon-only {
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+[data-theme="light"] .exit-btn-tooltip {
+  background: rgba(255, 255, 255, 0.95);
+  color: #1e293b;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .exit-btn-tooltip::after {
+  border-top-color: rgba(255, 255, 255, 0.95);
+}
 
 				/* Dropdown Menu */
 				.dropdown-menu {
