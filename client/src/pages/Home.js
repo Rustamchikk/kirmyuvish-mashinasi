@@ -25,7 +25,7 @@ const Home = () => {
   const [alert, setAlert] = useState({ type: '', message: '' })
   const [loading, setLoading] = useState(false)
 
-  const timeSlots = ['19:00-20:00', '20:00-21:00', '21:00-22:00']
+  const timeSlots = ['19:00-20:00', '20:00-21:00'] //'21:00-22:00' vaqat olib tashlandi
 
   // ✅ YANGI: Moscow vaqtini olish
   const getMoscowTime = () => {
@@ -54,9 +54,9 @@ const Home = () => {
       return true;
     }
     
-    if (timeSlot === '21:00-22:00' && currentTimeInMinutes > 21 * 60 + 1) {
-      return true;
-    }
+    // if (timeSlot === '21:00-22:00' && currentTimeInMinutes > 21 * 60 + 1) {
+    //   return true;
+    // }
     
     return currentTimeInMinutes >= startTimeInMinutes;
   };
