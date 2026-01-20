@@ -80,7 +80,7 @@ exports.createBooking = async (req, res) => {
             })
         }
 
-        const validTimeSlots = ['19:00-20:00', '20:00-21:00', '21:00-22:00']
+        const validTimeSlots = ['19:00-20:00', '20:00-21:00'] //'21:00-22:00' vaqat olib tashlandi
         if (!validTimeSlots.includes(time_slot)) {
             return res.status(400).json({
                 success: false,
