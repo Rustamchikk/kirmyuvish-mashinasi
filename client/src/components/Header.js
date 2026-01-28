@@ -117,9 +117,11 @@ const Header = () => {
     aria-label={t('header.changeLanguage')}
   >
     <div className="language-display">
+      <Globe size={16} className="globe-icon" />
       <span className="current-language-flag">{currentLanguage.flag}</span>
     </div>
   </button>
+  
   <div className={`language-dropdown-container ${languageDropdownOpen ? 'open' : ''}`}>
     <div className="language-dropdown-content">
       <div className="language-options">
