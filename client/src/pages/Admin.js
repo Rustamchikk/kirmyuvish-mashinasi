@@ -17,6 +17,7 @@ import {
   adminUsersHistoryAPI
 } from '../services/api'
 import { useAuth } from '../contexts/AuthContext'
+import favicon from './favicon.png';
 
 const Admin = () => {
   const { t, i18n } = useTranslation()
@@ -834,7 +835,7 @@ const Admin = () => {
           <tr key={machine.id}>
             <td className="machine-name-cell">
               <div className="machine-name-wrapper">
-                <span className="machine-icon">⚙️</span>
+                <img src={favicon} alt="Favicon" width="20" height="20" />
                 <span className="machine-name-text">{machine.name}</span>
               </div>
             </td>

@@ -13,7 +13,7 @@ import { useAuth } from '../contexts/AuthContext'
 
 const Home = () => {
   const { t } = useTranslation()
-  const { userRoom, login, isAuthenticated, checkWeekValidity } = useAuth()
+  const { userRoom, login, isAuthenticated, checkWeekValidity, userFullName } = useAuth()
   const navigate = useNavigate()
 
   const [machines, setMachines] = useState([])
@@ -128,10 +128,10 @@ const Home = () => {
     }
   }
 
-  const handleRegister = roomNumber => {
-    login(roomNumber)
-    showAlert('success', t('register.success'))
-  }
+  const handleRegister = (roomNumber, fullName = '') => { // ✅ fullName parametri qo'shildi
+  login(roomNumber, fullName) // ✅ fullName ni yuborish
+  showAlert('success', t('register.success'))
+}
 
   const handleMachineSelect = machineId => {
     if (selectedMachine === machineId) {
@@ -226,15 +226,31 @@ const Home = () => {
   }
 
   return (
-    <div className='admin-container'>
-      <header className='admin-header'>
-        <h1>{t('home.booking')}</h1>
-        <div className='user-info'>
-          <span>{t('home.room')}: {userRoom}</span>
+  <div className='admin-container'>
+    <header className='admin-header'>
+      {/* ✅ FAQAT BITTA USER INFO */}
+      <div className='user-info'>
+        <div className="user-profile-minimal">
+          <div className="user-avatar-minimal">
+            {userFullName ? userFullName.charAt(0).toUpperCase() : 'U'}
+          </div>
+          <div className="user-details-minimal">
+            <div className="user-full-name-minimal">
+              {userFullName || 'Foydalanuvchi'}
+            </div>
+            <div className="user-room-info-minimal">
+              <span className="room-icon-minimal">🏠</span>
+              <span className="room-text-minimal">
+                {t('home.room')}: <strong>{userRoom}</strong>
+              </span>
+            </div>
+          </div>
         </div>
-      </header>
+      </div>
+      
+    </header>
 
-      <Alert type={alert.type} message={alert.message} />
+    <Alert type={alert.type} message={alert.message} />
 
       {/* 1-BOSQICH: SANA TANLASH */}
       <section className='booking-step'>
