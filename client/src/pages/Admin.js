@@ -535,15 +535,6 @@ const Admin = () => {
 
   return (
     <div className='admin-container'>
-      <header className='admin-header'>
-        <h1>{t('admin.title')}</h1>
-        <div className='admin-info'>
-          <span className={`admin-badge ${adminType === 'super' ? 'super-admin' : 'regular-admin'}`}>
-            {adminType === 'super' ? t('admin.superAdmin') : t('admin.admin')}
-          </span>
-        </div>
-      </header>
-
       {/* 🔥 YANGILANGAN ALERT - FIXED POSITION */}
       <Alert 
         type={alert.type} 
@@ -583,58 +574,6 @@ const Admin = () => {
           <p>{t('admin.totalMachines')}</p>
         </div>
       </section>
-
-      {/* Mashinalarni boshqarish - Ikkala admin uchun ham */}
-      <section className='machine-section'>
-        <div className='section-header'>
-          <h2>{t('admin.machineManagement')}</h2>
-        </div>
-
-        <div className='table-container'>
-          <table>
-            <thead>
-              <tr>
-                <th>{t('admin.machines')}</th>
-                <th>{t('admin.status')}</th>
-                <th>{t('common.actions')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {machines.map(machine => (
-                <tr key={machine.id}>
-                  <td>{machine.name}</td>
-                  <td>
-                    <span
-                      className={
-                        machine.is_active ? 'status-active' : 'status-inactive'
-                      }
-                    >
-                      {machine.is_active
-                        ? t('admin.active')
-                        : t('admin.inactive')}
-                    </span>
-                  </td>
-                  <td>
-                    <button
-                      onClick={() =>
-                        handleMachineToggle(machine.id, machine.is_active)
-                      }
-                      className={
-                        machine.is_active ? 'btn-warning' : 'btn-success'
-                      }
-                    >
-                      {machine.is_active
-                        ? t('admin.turnOff')
-                        : t('admin.turnOn')}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
       {/* Sana tanlash - Ikkala admin uchun ham */}
       <section className='date-section'>
         <div className='section-header'>
@@ -751,7 +690,6 @@ const Admin = () => {
         )}
       </div>
     </div>
-
     {/* 21:00-22:00 guruh */}
     {/* <div className='time-group'>
       <h3 className='time-group-title'>🕘 21:00 - 22:00</h3>
@@ -802,65 +740,128 @@ const Admin = () => {
 </section>
 
       {/* Foydalanuvchilar - FAQAT SUPER ADMIN UCHUN */}
-      {adminType === 'super' && (
-        <section className='users-section'>
-          <div className='section-header'>
-            <h2>👥 {t('admin.users')}</h2>
-            <div className='users-actions'>
-              <div className='search-box'>
-                <input
-                  type='text'
-                  placeholder={t('admin.searchUsers')}
-                  value={userSearch}
-                  onChange={e => setUserSearch(e.target.value)}
-                  className='search-input'
-                />
-              </div>
-            </div>
-          </div>
-          <div className='table-container'>
-            {filteredUsers.length ? (
-              <table className='users-table'>
-                <thead>
-                  <tr>
-                    <th>{t('common.name')}</th>
-                    <th>{t('common.room')}</th>
-                    <th>{t('admin.registeredAt')}</th>
-                    <th>{t('common.actions')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredUsers.map(u => (
-                    <tr key={u.id}>
-                      <td className='user-name'>{u.full_name}</td>
-                      <td className='room-number'>{u.room_number}</td>
-                      <td className='registration-date'>
-                        {format(new Date(u.created_at), 'dd.MM.yyyy HH:mm')}
-                      </td>
-                      <td className='user-actions'>
-                        <button
-                          onClick={() => handleDeleteUser(u.id, u.full_name)}
-                          className='btn-danger btn-sm'
-                          title={t('admin.deleteUser')}
-                        >
-                           {t('common.delete')}
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <div className='no-users'>
-                <div className='no-users-icon'>👥</div>
-                <h4>{t('admin.noUsersFound')}</h4>
-                <p>{t('admin.noUsersMessage')}</p>
-              </div>
-            )}
-          </div>
-        </section>
+{adminType === 'super' && (
+  <section className='users-section'>
+    <div className='section-header'>
+      <h2>👥 {t('admin.registeredUsers')}</h2>
+      <div className='users-actions'>
+        <div className='search-box'>
+          <input
+            type='text'
+            placeholder={t('admin.searchUsers')}
+            value={userSearch}
+            onChange={e => setUserSearch(e.target.value)}
+            className='search-input'
+          />
+        </div>
+        
+        {/* ✅ YANGI: Barcha foydalanuvchilarni o'chirish tugmasi */}
+        <button
+          onClick={() => {
+            if (window.confirm(t('admin.confirmDeleteAllUsers'))) {
+              handleDeleteAllUsers();
+            }
+          }}
+          className='btn-delete-all'
+          title={t('admin.deleteAllUsers')}
+          disabled={users.length === 0}
+        >
+          <span className="delete-all-icon">🗑️</span>
+          {t('admin.deleteAllUsers')}
+        </button>
+      </div>
+    </div>
+    
+    <div className='table-container'>
+      {filteredUsers.length ? (
+        <table className='users-table'>
+          <thead>
+            <tr>
+              <th>{t('common.name')}</th>
+              <th>{t('common.room')}</th>
+              <th>{t('admin.registeredAt')}</th>
+              <th>{t('common.actions')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredUsers.map(u => (
+              <tr key={u.id}>
+                <td className='user-name'>{u.full_name}</td>
+                <td className='room-number'>{u.room_number}</td>
+                <td className='registration-date'>
+                  {format(new Date(u.created_at), 'dd.MM.yyyy HH:mm')}
+                </td>
+                <td className='user-actions'>
+                  <button
+                    onClick={() => handleDeleteUser(u.id, u.full_name)}
+                    className='btn-danger btn-sm'
+                    title={t('admin.deleteUser')}
+                  >
+                    {t('common.delete')}
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <div className='no-users'>
+          <div className='no-users-icon'>👥</div>
+          <h4>{t('admin.noUsersFound')}</h4>
+          <p>{t('admin.noUsersMessage')}</p>
+        </div>
       )}
+    </div>
+  </section>
+)}
+      {/* Mashinalarni boshqarish - Ikkala admin uchun ham */}
+<section className='machine-section'>
+  <div className='section-header'>
+    <h2>{t('admin.machineManagement')}</h2>
+  </div>
 
+  <div className='table-container'>
+    <table>
+      <thead>
+        <tr>
+          <th>{t('admin.machines')}</th>
+          <th>{t('admin.status')}</th>
+          <th>{t('common.actions')}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {machines.map(machine => (
+          <tr key={machine.id}>
+            <td className="machine-name-cell">
+              <div className="machine-name-wrapper">
+                <span className="machine-icon">⚙️</span>
+                <span className="machine-name-text">{machine.name}</span>
+              </div>
+            </td>
+            <td>
+              <div className="status-dot-wrapper">
+                <span className={`pulsating-dot ${machine.is_active ? 'online' : 'offline'}`}></span>
+                <span className="status-text">
+                  {machine.is_active ? t('admin.active') : t('admin.inactive')}
+                </span>
+              </div>
+            </td>
+            <td>
+              <label className="tg-toggle">
+                <input 
+                  type="checkbox" 
+                  checked={machine.is_active}
+                  onChange={() => handleMachineToggle(machine.id, machine.is_active)}
+                />
+                <span className="tg-toggle-slider"></span>
+              </label>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</section>
       {/* ✅ YANGILANGAN: Usersadmin Panel - ENG PASTDA FAQAT SUPER ADMIN UCHUN */}
       {adminType === 'super' && (
         <section className='history-section'>
