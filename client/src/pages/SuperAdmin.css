@@ -820,3 +820,354 @@
     margin-top: 2rem;
   }
 }
+/* ===== TELEGRAM TOGGLE SWITCH ===== */
+.tg-toggle {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.tg-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.tg-toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.tg-toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #999;
+    font-weight: bold;
+}
+
+/* Yoqilgan holat */
+.tg-toggle input:checked + .tg-toggle-slider {
+    background: linear-gradient(135deg, #2ea6ff, #0088cc);
+}
+
+.tg-toggle input:checked + .tg-toggle-slider:before {
+    transform: translateX(26px);
+    content: "✓";
+    color: #2ea6ff;
+}
+
+/* O'chirilgan holat */
+.tg-toggle input:not(:checked) + .tg-toggle-slider:before {
+    content: "✕";
+    color: #999;
+}
+
+/* Hover effekt */
+.tg-toggle:hover .tg-toggle-slider {
+    transform: scale(1.05);
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+/* Loading holati */
+.tg-toggle.loading input:checked + .tg-toggle-slider {
+    background: linear-gradient(135deg, #2ea6ff, #0088cc, #2ea6ff);
+    background-size: 200% 100%;
+    animation: tg-gradient 1.5s linear infinite;
+}
+
+@keyframes tg-gradient {
+    0% { background-position: 100% 0%; }
+    100% { background-position: 0% 0%; }
+}
+
+/* ===== PULSATING STATUS DOT ===== */
+.status-dot-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.pulsating-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    position: relative;
+    display: inline-block;
+}
+
+.pulsating-dot.online {
+    background-color: #00c853;
+    box-shadow: 0 0 0 0 rgba(0, 200, 83, 1);
+    animation: tg-pulse-green 2s infinite;
+}
+
+.pulsating-dot.offline {
+    background-color: #ff3b30;
+    box-shadow: 0 0 0 0 rgba(255, 59, 48, 1);
+    animation: tg-pulse-red 2s infinite;
+}
+
+@keyframes tg-pulse-green {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(0, 200, 83, 0.7);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(0, 200, 83, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(0, 200, 83, 0);
+    }
+}
+
+@keyframes tg-pulse-red {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.7);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(255, 59, 48, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(255, 59, 48, 0);
+    }
+}
+
+.status-text {
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: #333;
+    min-width: 80px;
+}
+
+/* ===== COMPACT VERSION ===== */
+.tg-toggle-compact {
+    width: 52px;
+    height: 28px;
+}
+
+.tg-toggle-compact .tg-toggle-slider:before {
+    height: 22px;
+    width: 22px;
+    left: 3px;
+    bottom: 3px;
+    font-size: 10px;
+}
+
+.tg-toggle-compact input:checked + .tg-toggle-slider:before {
+    transform: translateX(24px);
+}
+
+/* ===== DARK THEME ===== */
+.tg-toggle.dark .tg-toggle-slider {
+    background-color: #555;
+}
+
+.tg-toggle.dark input:checked + .tg-toggle-slider {
+    background: linear-gradient(135deg, #2ea6ff, #0066a1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .tg-toggle {
+        width: 52px;
+        height: 30px;
+    }
+    
+    .tg-toggle-slider:before {
+        height: 22px;
+        width: 22px;
+        font-size: 10px;
+    }
+    
+    .tg-toggle input:checked + .tg-toggle-slider:before {
+        transform: translateX(22px);
+    }
+    
+    .pulsating-dot {
+        width: 10px;
+        height: 10px;
+    }
+    
+    .status-text {
+        font-size: 0.9rem;
+        min-width: 70px;
+    }
+}
+
+@media (max-width: 480px) {
+    .tg-toggle {
+        width: 48px;
+        height: 28px;
+    }
+    
+    .tg-toggle-slider:before {
+        height: 20px;
+        width: 20px;
+        font-size: 9px;
+    }
+    
+    .tg-toggle input:checked + .tg-toggle-slider:before {
+        transform: translateX(20px);
+    }
+}
+/* Mashina nomi uchun qo'shimcha stillar */
+.machine-name-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px;
+    background: linear-gradient(135deg, rgba(0, 136, 204, 0.05), transparent);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.machine-name-wrapper:hover {
+    background: linear-gradient(135deg, rgba(0, 136, 204, 0.1), transparent);
+    transform: translateX(5px);
+}
+
+.machine-icon {
+    font-size: 1.3rem;
+    opacity: 0.8;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 136, 204, 0.1);
+    border-radius: 50%;
+    color: #0088cc;
+}
+
+.machine-name-text {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    letter-spacing: 0.3px;
+}
+
+/* Table cell padding */
+.machine-name-cell {
+    padding-left: 0;
+}
+/* ===== DELETE ALL BUTTON ===== */
+.btn-delete-all {
+    background: linear-gradient(135deg, #ff3b30, #d32f2f);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(255, 59, 48, 0.3);
+    white-space: nowrap;
+}
+
+.btn-delete-all:hover:not(:disabled) {
+    background: linear-gradient(135deg, #d32f2f, #b71c1c);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 59, 48, 0.4);
+}
+
+.btn-delete-all:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(255, 59, 48, 0.3);
+}
+
+.btn-delete-all:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+    box-shadow: none;
+}
+
+.delete-all-icon {
+    font-size: 1.1rem;
+}
+
+/* Users actions - yangilash */
+.users-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.search-box {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex: 1;
+    min-width: 250px;
+}
+
+/* Delete user button - yangilash */
+.btn-danger {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+    color: white;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #ee5a52, #e53935);
+    transform: scale(1.05);
+}
+
+.btn-danger.btn-sm {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .users-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.8rem;
+    }
+    
+    .search-box {
+        min-width: 100%;
+    }
+    
+    .btn-delete-all {
+        width: 100%;
+        justify-content: center;
+    }
+}
