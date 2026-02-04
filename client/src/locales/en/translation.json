@@ -164,7 +164,17 @@
 		 "invalid_credentials": "Invalid login or password",
 		"account_locked": "Your account is locked",
 		"account_locked_after_attempts": "Your account has been locked",
-		"login_success": "Login successful"
+		"login_success": "Login successful",
+		"searchUsers": "Search Users",
+		"confirmDeleteAllUsers": "Delete all users?",
+		"deleteAllUsers": "Delete All",
+		"allUsersDeleted": "All users deleted",
+		"confirmDeleteBooking": "Delete booking?",
+		"confirmEndAllSessions": "End all sessions?",
+		"sessionEnded": "Session ended",
+		"allSessionsEnded": "All sessions ended",
+		"confirmDeleteUser": "Delete user?",
+		"userDeleted": "User deleted"
 	},
 	"auth": {
     "accountLocked": "You have tried too many times, please try again later!",

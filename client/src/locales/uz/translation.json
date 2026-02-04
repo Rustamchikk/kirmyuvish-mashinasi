@@ -171,7 +171,20 @@
 		"invalid_credentials": "Noto'g'ri login yoki parol",
 		"account_locked": "Hisobingiz bloklangan",
 		"account_locked_after_attempts": "Hisobingiz bloklandi",
-		"login_success": "Muvaffaqiyatli kirish"
+		"login_success": "Muvaffaqiyatli kirish",
+		"usersDeletedCount": "{{success}}/{{total}} ta foydalanuvchi o'chirildi",
+		"usersDeleteErrors": "{{errors}} ta foydalanuvchi o'chirilmadi",
+		"deletingUser": "Foydalanuvchi o'chirilmoqda... ({{current}}/{{total}})",
+		"searchUsers": "Foydalanuvchilarni qidirish",
+		"confirmDeleteAllUsers": "Barcha foydalanuvchilarni o'chirishni istaysizmi?",
+		"deleteAllUsers": "Barchasini o'chirish",
+		"allUsersDeleted": "Barcha foydalanuvchilar o'chirildi",
+		"confirmDeleteBooking": "Bronni o'chirishni istaysizmi?",
+		"confirmEndAllSessions": "Barcha sessiyalarni yakunlashni istaysizmi?",
+		"sessionEnded": "Sessiya yakunlandi",
+		"allSessionsEnded": "Barcha sessiyalar yakunlandi",
+		"confirmDeleteUser": "Foydalanuvchini o'chirishni istaysizmi?",
+		"userDeleted": "Foydalanuvchi o'chirildi"
 	},
 	"common": {
 		"room": "Xona",

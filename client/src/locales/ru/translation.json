@@ -165,7 +165,17 @@
 		"invalid_credentials": "Неверный логин или пароль",
 		"account_locked": "Ваш аккаунт заблокирован",
 		"account_locked_after_attempts": "Ваш аккаунт заблокирован",
-		"login_success": "Успешный вход"
+		"login_success": "Успешный вход",
+		"searchUsers": "Поиск пользователей",
+		"confirmDeleteAllUsers": "Удалить всех пользователей?",
+		"deleteAllUsers": "Удалить всех",
+		"allUsersDeleted": "Все пользователи удалены",
+		"confirmDeleteBooking": "Удалить бронь?",
+		"confirmEndAllSessions": "Завершить все сессии?",
+		"sessionEnded": "Сессия завершена",
+		"allSessionsEnded": "Все сессии завершены",
+		"confirmDeleteUser": "Удалить пользователя?",
+		"userDeleted": "Пользователь удален"
 	},
 	"auth": {
     "accountLocked": "Вы сделали слишком много попыток, пожалуйста, попробуйте позже!",
