@@ -101,6 +101,9 @@ const Register = ({ onRegister }) => {
 
         login(user.room_number, user.full_name)
         onRegister(user.room_number)
+        // ✅ Home.js dagi onRegister ga IKKALA PARAMETRNI yuborish
+        if (typeof onRegister === 'function') {
+          onRegister(user.room_number, user.full_name)}
       }
     } catch (error) {
       const rawKey = error.response?.data?.message
