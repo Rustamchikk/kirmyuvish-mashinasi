@@ -42,7 +42,7 @@ router.delete('/:userId', async (req, res) => {
 });
 
 // Barcha foydalanuvchilarni o'chirish
-router.delete('/users', async (req, res) => {
+router.delete('/', async (req, res) => {
   try {
     // Avval bog'liq ma'lumotlarni o'chirish
     await pool.query('DELETE FROM bookings');
