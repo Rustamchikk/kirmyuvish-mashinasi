@@ -1,4 +1,4 @@
-// src/contexts/AuthContext.js
+// src/contexts/AuthContext.js - TO'LIQ TUZATILGAN
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { startOfWeek, format } from 'date-fns'
 
@@ -14,9 +14,12 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [userRoom, setUserRoom] = useState('')
-  const [userName, setUserName] = useState('')
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [userFullName, setUserFullName] = useState(() => localStorage.getItem('userFullName') || '')
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [userRoom, setUserRoom] = useState(() => localStorage.getItem('userRoom') || '')
   const [isAdmin, setIsAdmin] = useState(false)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [registrationWeek, setRegistrationWeek] = useState('')
 
   // Joriy haftani olish
@@ -27,22 +30,20 @@ export const AuthProvider = ({ children }) => {
   // LocalStorage'dan ma'lumotlarni yuklash
   useEffect(() => {
     const savedUserRoom = localStorage.getItem('userRoom')
-    const savedUserName = localStorage.getItem('userName')
+    const savedUserFullName = localStorage.getItem('userFullName')
     const savedRegistrationWeek = localStorage.getItem('registrationWeek')
     const currentWeek = getCurrentWeek()
 
-    if (savedUserRoom && savedUserName && savedRegistrationWeek) {
-      // Agar ro'yxatdan o'tgan hafta joriy haftaga teng bo'lsa
+    if (savedUserRoom && savedUserFullName && savedRegistrationWeek) {
       if (savedRegistrationWeek === currentWeek) {
         setUserRoom(savedUserRoom)
-        setUserName(savedUserName)
+        setUserFullName(savedUserFullName)
         setRegistrationWeek(savedRegistrationWeek)
         setIsAuthenticated(true)
         setIsAdmin(false)
       } else {
-        // Yangi hafta boshlangan, avvalgi ma'lumotlarni o'chiramiz
         localStorage.removeItem('userRoom')
-        localStorage.removeItem('userName')
+        localStorage.removeItem('userFullName')
         localStorage.removeItem('registrationWeek')
         setIsAuthenticated(false)
       }
@@ -52,34 +53,34 @@ export const AuthProvider = ({ children }) => {
   const login = (roomNumber, fullName) => {
     const currentWeek = getCurrentWeek()
     setUserRoom(roomNumber)
-    setUserName(fullName)
+    setUserFullName(fullName)
     setRegistrationWeek(currentWeek)
     localStorage.setItem('userRoom', roomNumber)
-    localStorage.setItem('userName', fullName)
+    localStorage.setItem('userFullName', fullName)
     localStorage.setItem('registrationWeek', currentWeek)
     setIsAuthenticated(true)
     setIsAdmin(false)
   }
 
- const logout = () => {
-  setUserRoom('')
-  setUserName('')
-  setRegistrationWeek('')
-  localStorage.removeItem('userRoom')
-  localStorage.removeItem('userName')
-  localStorage.removeItem('registrationWeek')
-  setIsAuthenticated(false)
-  setIsAdmin(false)
+  const logout = () => {
+    setUserRoom('')
+    setUserFullName('')
+    setRegistrationWeek('')
+    localStorage.removeItem('userRoom')
+    localStorage.removeItem('userFullName')
+    localStorage.removeItem('registrationWeek')
+    setIsAuthenticated(false)
+    setIsAdmin(false)
   }
 
   const adminLogin = () => {
     setIsAuthenticated(true)
     setIsAdmin(true)
     setUserRoom('')
-    setUserName('')
+    setUserFullName('')
     setRegistrationWeek('')
     localStorage.removeItem('userRoom')
-    localStorage.removeItem('userName')
+    localStorage.removeItem('userFullName')
     localStorage.removeItem('registrationWeek')
   }
 
@@ -87,20 +88,18 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false)
     setIsAdmin(false)
     setUserRoom('')
-    setUserName('')
+    setUserFullName('')
     setRegistrationWeek('')
     localStorage.removeItem('userRoom')
-    localStorage.removeItem('userName')
+    localStorage.removeItem('userFullName')
     localStorage.removeItem('registrationWeek')
   }
 
-  // Hafta tekshiruvi
   const checkWeekValidity = () => {
     const currentWeek = getCurrentWeek()
     const savedWeek = localStorage.getItem('registrationWeek')
     
     if (savedWeek && savedWeek !== currentWeek) {
-      // Yangi hafta boshlangan, logout qilamiz
       logout()
       return false
     }
@@ -110,7 +109,7 @@ export const AuthProvider = ({ children }) => {
   const value = {
     isAuthenticated,
     userRoom,
-    userName,
+    userFullName,
     isAdmin,
     registrationWeek,
     login,
